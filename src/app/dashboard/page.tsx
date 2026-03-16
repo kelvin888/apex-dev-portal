@@ -61,10 +61,12 @@ export default function DashboardPage() {
     queryFn: () => api.get<ChartData[]>('/dashboard/chart'),
   });
 
-  const { data: recentApps } = useQuery({
+  const { data: recentAppsResponse } = useQuery({
     queryKey: ['recent-apps'],
-    queryFn: () => api.get<RecentApp[]>('/apps?limit=5'),
+    queryFn: () => api.get<{ apps: RecentApp[]; total: number }>('/apps?limit=5'),
   });
+
+  const recentApps = recentAppsResponse?.apps;
 
   // Mock data for development
   const mockStats: DashboardStats = {

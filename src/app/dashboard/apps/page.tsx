@@ -35,11 +35,13 @@ export default function AppsPage() {
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState<string>('all');
 
-  const { data: apps, isLoading } = useQuery({
+  const { data: appsResponse, isLoading } = useQuery({
     queryKey: ['apps', search, filter],
     queryFn: () =>
-      api.get<App[]>(`/apps?search=${search}&status=${filter}`),
+      api.get<{ apps: App[]; total: number }>(`/apps?search=${search}&status=${filter === 'all' ? '' : filter}`),
   });
+
+  const apps = appsResponse?.apps;
 
   // Mock data for development
   const mockApps: App[] = [
