@@ -3,102 +3,64 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { api } from '@/lib/api';
-import {
-  Download,
-  Users,
-  TrendingUp,
-  Globe,
-  Smartphone,
-  Clock,
-} from 'lucide-react';
+import { Download, Users, TrendingUp, Clock, BarChart2 } from 'lucide-react';
 import {
   AreaChart,
   Area,
-  BarChart,
-  Bar,
-  PieChart,
-  Pie,
-  Cell,
   XAxis,
   YAxis,
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
-  Legend,
 } from 'recharts';
 
 type Period = '7d' | '30d' | '90d';
 
-const COLORS = ['#1890ff', '#52c41a', '#faad14', '#ff4d4f', '#722ed1'];
+interface ChartData { date: string; downloads: number; users: number; }
+interface DashboardStats {
+  totalDownloads: number;
+  activeUsers: number;
+  changes: { downloads: number; users: number; };
+}
 
 export default function AnalyticsPage() {
   const [period, setPeriod] = useState<Period>('30d');
 
-  // Mock data for development
-  const downloadsTrend = [
-    { date: 'Mar 1', downloads: 245 },
-    { date: 'Mar 5', downloads: 312 },
-    { date: 'Mar 10', downloads: 289 },
-    { date: 'Mar 15', downloads: 401 },
-    { date: 'Mar 20', downloads: 356 },
-    { date: 'Mar 25', downloads: 423 },
-    { date: 'Mar 30', downloads: 487 },
-  ];
+  const { data: stats } = useQuery({
+    queryKey: ['dashboard-stats'],
+    queryFn: () => api.get<DashboardStats>('/dashboard/stats'),
+  });
 
-  const usersTrend = [
-    { date: 'Mar 1', active: 1245, new: 89 },
-    { date: 'Mar 5', active: 1312, new: 102 },
-    { date: 'Mar 10', active: 1289, new: 78 },
-    { date: 'Mar 15', active: 1401, new: 115 },
-    { date: 'Mar 20', active: 1356, new: 92 },
-    { date: 'Mar 25', active: 1423, new: 128 },
-    { date: 'Mar 30', active: 1487, new: 134 },
-  ];
+  const { data: chartData } = useQuery({
+    queryKey: ['dashboard-chart'],
+    queryFn: () => api.get<ChartData[]>('/dashboard/chart'),
+  });
 
-  const appBreakdown = [
-    { name: 'QuickShop', downloads: 2341 },
-    { name: 'FoodExpress', downloads: 1890 },
-    { name: 'Budget Tracker', downloads: 1201 },
-  ];
-
-  const platformData = [
-    { name: 'iOS', value: 45 },
-    { name: 'Android', value: 55 },
-  ];
-
-  const regionData = [
-    { name: 'Nigeria', value: 35 },
-    { name: 'Kenya', value: 25 },
-    { name: 'South Africa', value: 20 },
-    { name: 'Ghana', value: 12 },
-    { name: 'Other', value: 8 },
-  ];
-
-  const retentionData = [
-    { day: 'Day 1', retention: 100 },
-    { day: 'Day 3', retention: 72 },
-    { day: 'Day 7', retention: 58 },
-    { day: 'Day 14', retention: 45 },
-    { day: 'Day 30', retention: 32 },
-  ];
+  const downloads = chartData ?? [];
+  const totalDownloads = stats?.totalDownloads ?? 0;
+  const activeUsers = stats?.activeUsers ?? 0;
+  const downloadChange = stats?.changes.downloads ?? 0;
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-gray-900">Analytics</h1>
         <div className="flex gap-2 bg-gray-100 p-1 rounded-lg">
-          {(['7d', '30d', '90d'] as Period[]).map((p) => (
-            <button
-              key={p}
-              onClick={() => setPeriod(p)}
-              className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
-                period === p
-                  ? 'bg-white text-gray-900 shadow-sm'
-                  : 'text-gray-600 hover:text-gray-900'
-              }`}
-            >
-              {p === '7d' ? '7 Days' : p === '30d' ? '30 Days' : '90 Days'}
-            </button>
+          {(['7d', '30d', '90d'] as Period[]).map((p) => {
+            const PERIOD_LABELS: Record<Period, string> = { '7d': '7 Days', '30d': '30 Days', '90d': '90 Days' };
+            return (
+              <button
+                key={p}
+                onClick={() => setPeriod(p)}
+                className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
+                  period === p
+                    ? 'bg-white text-gray-900 shadow-sm'
+                    : 'text-gray-600 hover:text-gray-900'
+                }`}
+              >
+                {PERIOD_LABELS[p]}
+              </button>
+            );
           ))}
         </div>
       </div>
@@ -108,43 +70,41 @@ export default function AnalyticsPage() {
         <StatCard
           icon={Download}
           title="Total Downloads"
-          value="12,547"
-          change={12.5}
-          period={period}
+          value={totalDownloads.toLocaleString()}
+          change={downloadChange}
         />
         <StatCard
           icon={Users}
           title="Active Users"
-          value="3,421"
-          change={8.3}
-          period={period}
+          value={activeUsers.toLocaleString()}
+          change={0}
         />
         <StatCard
           icon={TrendingUp}
           title="Avg. Session"
-          value="4m 32s"
-          change={5.2}
-          period={period}
+          value="—"
+          noChange
         />
         <StatCard
           icon={Clock}
           title="Retention"
-          value="32%"
-          change={-2.1}
-          period={period}
+          value="—"
+          noChange
         />
       </div>
 
-      {/* Downloads & Users Charts */}
-      <div className="grid lg:grid-cols-2 gap-6">
-        <div className="card">
-          <div className="card-header">
-            <h2 className="font-semibold">Downloads Trend</h2>
-          </div>
-          <div className="card-body">
+      {/* Downloads Trend */}
+      <div className="card">
+        <div className="card-header">
+          <h2 className="font-semibold">Downloads Trend</h2>
+        </div>
+        <div className="card-body">
+          {downloads.length === 0 ? (
+            <EmptyChart message="Downloads will appear here once users install your apps." />
+          ) : (
             <div className="h-72">
               <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={downloadsTrend}>
+                <AreaChart data={downloads}>
                   <defs>
                     <linearGradient id="colorDownloads" x1="0" y1="0" x2="0" y2="1">
                       <stop offset="5%" stopColor="#1890ff" stopOpacity={0.3} />
@@ -165,147 +125,30 @@ export default function AnalyticsPage() {
                 </AreaChart>
               </ResponsiveContainer>
             </div>
-          </div>
-        </div>
-
-        <div className="card">
-          <div className="card-header">
-            <h2 className="font-semibold">Active & New Users</h2>
-          </div>
-          <div className="card-body">
-            <div className="h-72">
-              <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={usersTrend}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                  <XAxis dataKey="date" tick={{ fontSize: 12 }} />
-                  <YAxis tick={{ fontSize: 12 }} />
-                  <Tooltip />
-                  <Legend />
-                  <Area
-                    type="monotone"
-                    dataKey="active"
-                    name="Active Users"
-                    stroke="#1890ff"
-                    fill="#1890ff"
-                    fillOpacity={0.3}
-                  />
-                  <Area
-                    type="monotone"
-                    dataKey="new"
-                    name="New Users"
-                    stroke="#52c41a"
-                    fill="#52c41a"
-                    fillOpacity={0.3}
-                  />
-                </AreaChart>
-              </ResponsiveContainer>
-            </div>
-          </div>
+          )}
         </div>
       </div>
 
-      {/* App Breakdown & Demographics */}
+      {/* Sections not yet tracked by the server */}
       <div className="grid lg:grid-cols-3 gap-6">
-        <div className="card">
-          <div className="card-header">
-            <h2 className="font-semibold">Downloads by App</h2>
-          </div>
-          <div className="card-body">
-            <div className="h-64">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={appBreakdown} layout="vertical">
-                  <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                  <XAxis type="number" tick={{ fontSize: 12 }} />
-                  <YAxis dataKey="name" type="category" tick={{ fontSize: 12 }} width={100} />
-                  <Tooltip />
-                  <Bar dataKey="downloads" fill="#1890ff" radius={[0, 4, 4, 0]} />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          </div>
-        </div>
-
-        <div className="card">
-          <div className="card-header flex items-center gap-2">
-            <Smartphone className="h-5 w-5 text-gray-500" />
-            <h2 className="font-semibold">Platform</h2>
-          </div>
-          <div className="card-body">
-            <div className="h-64">
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={platformData}
-                    cx="50%"
-                    cy="50%"
-                    innerRadius={60}
-                    outerRadius={80}
-                    paddingAngle={5}
-                    dataKey="value"
-                    label={({ name, value }) => `${name}: ${value}%`}
-                  >
-                    {platformData.map((entry, index) => (
-                      <Cell key={entry.name} fill={COLORS[index]} />
-                    ))}
-                  </Pie>
-                  <Tooltip />
-                </PieChart>
-              </ResponsiveContainer>
-            </div>
-          </div>
-        </div>
-
-        <div className="card">
-          <div className="card-header flex items-center gap-2">
-            <Globe className="h-5 w-5 text-gray-500" />
-            <h2 className="font-semibold">Top Regions</h2>
-          </div>
-          <div className="card-body">
-            <div className="space-y-3">
-              {regionData.map((region, index) => (
-                <div key={region.name} className="flex items-center gap-3">
-                  <div className="text-sm text-gray-600 w-24">{region.name}</div>
-                  <div className="flex-1 bg-gray-100 rounded-full h-2">
-                    <div
-                      className="h-full rounded-full"
-                      style={{
-                        width: `${region.value}%`,
-                        backgroundColor: COLORS[index % COLORS.length],
-                      }}
-                    />
-                  </div>
-                  <div className="text-sm font-medium w-12 text-right">
-                    {region.value}%
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
+        <ComingSoonCard
+          title="Downloads by App"
+          description="Per-app breakdown will appear here once your apps have downloads."
+        />
+        <ComingSoonCard
+          title="Platform Split"
+          description="iOS vs Android breakdown coming soon."
+        />
+        <ComingSoonCard
+          title="Top Regions"
+          description="Geographic data coming soon."
+        />
       </div>
 
-      {/* Retention */}
-      <div className="card">
-        <div className="card-header">
-          <h2 className="font-semibold">User Retention</h2>
-          <p className="text-sm text-gray-500 mt-1">
-            Percentage of users returning after their first visit
-          </p>
-        </div>
-        <div className="card-body">
-          <div className="h-64">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={retentionData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                <XAxis dataKey="day" tick={{ fontSize: 12 }} />
-                <YAxis tick={{ fontSize: 12 }} unit="%" />
-                <Tooltip />
-                <Bar dataKey="retention" fill="#52c41a" radius={[4, 4, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
-      </div>
+      <ComingSoonCard
+        title="User Retention"
+        description="Cohort retention analysis coming soon."
+      />
     </div>
   );
 }
@@ -315,16 +158,15 @@ function StatCard({
   title,
   value,
   change,
-  period,
-}: {
+  noChange,
+}: Readonly<{
   icon: React.ComponentType<{ className?: string }>;
   title: string;
   value: string;
-  change: number;
-  period: Period;
-}) {
-  const isPositive = change >= 0;
-  const periodLabel = period === '7d' ? 'week' : period === '30d' ? 'month' : '3 months';
+  change?: number;
+  noChange?: boolean;
+}>) {
+  const isPositive = (change ?? 0) >= 0;
 
   return (
     <div className="card p-5">
@@ -332,18 +174,42 @@ function StatCard({
         <div className="p-2 bg-primary-50 rounded-lg">
           <Icon className="h-5 w-5 text-primary-600" />
         </div>
-        <span
-          className={`text-sm ${isPositive ? 'text-success-600' : 'text-error-600'}`}
-        >
-          {isPositive ? '+' : ''}
-          {change}%
-        </span>
+        {!noChange && change !== undefined && change !== 0 && (
+          <span className={`text-sm ${isPositive ? 'text-success-600' : 'text-error-600'}`}>
+            {isPositive ? '+' : ''}{change}%
+          </span>
+        )}
       </div>
       <div className="mt-4">
         <div className="text-2xl font-bold text-gray-900">{value}</div>
         <div className="text-sm text-gray-500">{title}</div>
       </div>
-      <div className="text-xs text-gray-400 mt-2">vs last {periodLabel}</div>
+      {!noChange && <div className="text-xs text-gray-400 mt-2">vs last 30 days</div>}
+    </div>
+  );
+}
+
+function EmptyChart({ message }: Readonly<{ message: string }>) {
+  return (
+    <div className="h-72 flex flex-col items-center justify-center text-center text-gray-400">
+      <BarChart2 className="h-10 w-10 mb-3 text-gray-300" />
+      <p className="text-sm max-w-xs">{message}</p>
+    </div>
+  );
+}
+
+function ComingSoonCard({ title, description }: Readonly<{ title: string; description: string }>) {
+  return (
+    <div className="card">
+      <div className="card-header">
+        <h2 className="font-semibold">{title}</h2>
+      </div>
+      <div className="card-body">
+        <div className="h-40 flex flex-col items-center justify-center text-center text-gray-400">
+          <BarChart2 className="h-8 w-8 mb-2 text-gray-300" />
+          <p className="text-sm">{description}</p>
+        </div>
+      </div>
     </div>
   );
 }

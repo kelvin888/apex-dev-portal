@@ -23,9 +23,9 @@ interface App {
   name: string;
   description?: string;
   icon?: string;
-  status: 'draft' | 'review' | 'published' | 'rejected';
-  version: string;
-  downloads: number;
+  status: 'draft' | 'pending' | 'approved' | 'rejected' | 'suspended';
+  latestVersion?: string;
+  totalDownloads: number;
   rating?: number;
   createdAt: string;
   updatedAt: string;
@@ -37,60 +37,16 @@ export default function AppsPage() {
 
   const { data: appsResponse, isLoading } = useQuery({
     queryKey: ['apps', search, filter],
-    queryFn: () =>
-      api.get<{ apps: App[]; total: number }>(`/apps?search=${search}&status=${filter === 'all' ? '' : filter}`),
+    queryFn: () => {
+      const params = new URLSearchParams();
+      if (search) params.set('search', search);
+      if (filter && filter !== 'all') params.set('status', filter);
+      const queryString = params.toString();
+      return api.get<{ apps: App[]; total: number }>(`/apps${queryString ? `?${queryString}` : ''}`);
+    },
   });
 
-  const apps = appsResponse?.apps;
-
-  // Mock data for development
-  const mockApps: App[] = [
-    {
-      id: '1',
-      appId: 'com.example.shop',
-      name: 'QuickShop',
-      description: 'E-commerce mini-app for quick shopping',
-      status: 'published',
-      version: '1.2.3',
-      downloads: 5432,
-      rating: 4.5,
-      createdAt: '2024-01-15T10:00:00Z',
-      updatedAt: '2024-03-10T14:30:00Z',
-    },
-    {
-      id: '2',
-      appId: 'com.example.food',
-      name: 'FoodExpress',
-      description: 'Food delivery and restaurant discovery',
-      status: 'review',
-      version: '2.0.0',
-      downloads: 3210,
-      rating: 4.2,
-      createdAt: '2024-02-01T08:00:00Z',
-      updatedAt: '2024-03-14T09:15:00Z',
-    },
-    {
-      id: '3',
-      appId: 'com.example.tracker',
-      name: 'Budget Tracker',
-      description: 'Personal finance and expense tracking',
-      status: 'draft',
-      version: '0.1.0',
-      downloads: 0,
-      createdAt: '2024-03-12T16:00:00Z',
-      updatedAt: '2024-03-12T16:00:00Z',
-    },
-  ];
-
-  const displayApps = apps || mockApps;
-
-  const filteredApps = displayApps.filter((app) => {
-    if (filter !== 'all' && app.status !== filter) return false;
-    if (search && !app.name.toLowerCase().includes(search.toLowerCase())) {
-      return false;
-    }
-    return true;
-  });
+  const apps = appsResponse?.apps || [];
 
   return (
     <div className="space-y-6">
@@ -115,7 +71,7 @@ export default function AppsPage() {
           />
         </div>
         <div className="flex gap-2">
-          {['all', 'published', 'review', 'draft'].map((status) => (
+          {['all', 'approved', 'pending', 'draft'].map((status) => (
             <button
               key={status}
               onClick={() => setFilter(status)}
@@ -175,17 +131,19 @@ function AppCard({ app }: { app: App }) {
   const [menuOpen, setMenuOpen] = useState(false);
 
   const statusColors: Record<string, string> = {
-    published: 'badge-success',
-    review: 'badge-warning',
+    approved: 'badge-success',
+    pending: 'badge-warning',
     draft: 'badge-info',
     rejected: 'badge-error',
+    suspended: 'badge-error',
   };
 
   const statusLabels: Record<string, string> = {
-    published: 'Published',
-    review: 'In Review',
+    approved: 'Approved',
+    pending: 'Pending Review',
     draft: 'Draft',
     rejected: 'Rejected',
+    suspended: 'Suspended',
   };
 
   return (
@@ -271,10 +229,10 @@ function AppCard({ app }: { app: App }) {
           {statusLabels[app.status]}
         </span>
         <div className="flex items-center gap-3 text-sm text-gray-500">
-          <span>v{app.version}</span>
+          {app.latestVersion && <span>v{app.latestVersion}</span>}
           <span className="flex items-center gap-1">
             <Download className="h-3.5 w-3.5" />
-            {app.downloads.toLocaleString()}
+            {app.totalDownloads.toLocaleString()}
           </span>
         </div>
       </div>

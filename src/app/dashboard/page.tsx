@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import { useQuery } from '@tanstack/react-query';
-import { api } from '@/lib/api';
+import { useQuery } from "@tanstack/react-query";
+import { api } from "@/lib/api";
 import {
   Package,
   Download,
@@ -10,8 +10,8 @@ import {
   ArrowUpRight,
   ArrowDownRight,
   Plus,
-} from 'lucide-react';
-import Link from 'next/link';
+} from "lucide-react";
+import Link from "next/link";
 import {
   AreaChart,
   Area,
@@ -20,7 +20,7 @@ import {
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
-} from 'recharts';
+} from "recharts";
 
 interface DashboardStats {
   totalApps: number;
@@ -47,53 +47,38 @@ interface RecentApp {
   appId: string;
   icon?: string;
   downloads: number;
-  status: 'published' | 'review' | 'draft';
+  status: "published" | "review" | "draft";
 }
 
 export default function DashboardPage() {
   const { data: stats } = useQuery({
-    queryKey: ['dashboard-stats'],
-    queryFn: () => api.get<DashboardStats>('/dashboard/stats'),
+    queryKey: ["dashboard-stats"],
+    queryFn: () => api.get<DashboardStats>("/dashboard/stats"),
   });
 
   const { data: chartData } = useQuery({
-    queryKey: ['dashboard-chart'],
-    queryFn: () => api.get<ChartData[]>('/dashboard/chart'),
+    queryKey: ["dashboard-chart"],
+    queryFn: () => api.get<ChartData[]>("/dashboard/chart"),
   });
 
   const { data: recentAppsResponse } = useQuery({
-    queryKey: ['recent-apps'],
-    queryFn: () => api.get<{ apps: RecentApp[]; total: number }>('/apps?limit=5'),
+    queryKey: ["recent-apps"],
+    queryFn: () =>
+      api.get<{ apps: RecentApp[]; total: number }>("/apps?limit=5"),
   });
 
   const recentApps = recentAppsResponse?.apps;
 
-  // Mock data for development
-  const mockStats: DashboardStats = {
-    totalApps: 3,
-    totalDownloads: 12547,
-    activeUsers: 3421,
-    revenue: 4250,
-    changes: {
-      apps: 0,
-      downloads: 12.5,
-      users: 8.3,
-      revenue: 15.2,
-    },
+  const EMPTY_STATS: DashboardStats = {
+    totalApps: 0,
+    totalDownloads: 0,
+    activeUsers: 0,
+    revenue: 0,
+    changes: { apps: 0, downloads: 0, users: 0, revenue: 0 },
   };
 
-  const mockChartData: ChartData[] = [
-    { date: 'Jan', downloads: 4000, users: 2400 },
-    { date: 'Feb', downloads: 3000, users: 1398 },
-    { date: 'Mar', downloads: 2000, users: 9800 },
-    { date: 'Apr', downloads: 2780, users: 3908 },
-    { date: 'May', downloads: 1890, users: 4800 },
-    { date: 'Jun', downloads: 2390, users: 3800 },
-    { date: 'Jul', downloads: 3490, users: 4300 },
-  ];
-
-  const displayStats = stats || mockStats;
-  const displayChart = chartData || mockChartData;
+  const displayStats = stats ?? EMPTY_STATS;
+  const displayChart = chartData ?? [];
 
   return (
     <div className="space-y-6">
@@ -144,7 +129,13 @@ export default function DashboardPage() {
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={displayChart}>
                   <defs>
-                    <linearGradient id="colorDownloads" x1="0" y1="0" x2="0" y2="1">
+                    <linearGradient
+                      id="colorDownloads"
+                      x1="0"
+                      y1="0"
+                      x2="0"
+                      y2="1"
+                    >
                       <stop offset="5%" stopColor="#1890ff" stopOpacity={0.3} />
                       <stop offset="95%" stopColor="#1890ff" stopOpacity={0} />
                     </linearGradient>
@@ -158,12 +149,12 @@ export default function DashboardPage() {
                     dataKey="date"
                     axisLine={false}
                     tickLine={false}
-                    tick={{ fill: '#9ca3af', fontSize: 12 }}
+                    tick={{ fill: "#9ca3af", fontSize: 12 }}
                   />
                   <YAxis
                     axisLine={false}
                     tickLine={false}
-                    tick={{ fill: '#9ca3af', fontSize: 12 }}
+                    tick={{ fill: "#9ca3af", fontSize: 12 }}
                   />
                   <Tooltip />
                   <Area
@@ -245,12 +236,12 @@ function StatCard({
   value,
   change,
   icon: Icon,
-}: {
+}: Readonly<{
   title: string;
   value: string | number;
   change: number;
   icon: React.ComponentType<{ className?: string }>;
-}) {
+}>) {
   const isPositive = change >= 0;
 
   return (
@@ -262,7 +253,7 @@ function StatCard({
         {change !== 0 && (
           <div
             className={`flex items-center text-sm ${
-              isPositive ? 'text-success-600' : 'text-error-600'
+              isPositive ? "text-success-600" : "text-error-600"
             }`}
           >
             {isPositive ? (
@@ -282,18 +273,18 @@ function StatCard({
   );
 }
 
-function StatusBadge({ status }: { status: string }) {
+function StatusBadge({ status }: Readonly<{ status: string }>) {
   const styles: Record<string, string> = {
-    published: 'badge-success',
-    review: 'badge-warning',
-    draft: 'badge-info',
+    published: "badge-success",
+    review: "badge-warning",
+    draft: "badge-info",
   };
 
   const labels: Record<string, string> = {
-    published: 'Published',
-    review: 'In Review',
-    draft: 'Draft',
+    published: "Published",
+    review: "In Review",
+    draft: "Draft",
   };
 
-  return <span className={styles[status] || 'badge'}>{labels[status]}</span>;
+  return <span className={styles[status] || "badge"}>{labels[status]}</span>;
 }

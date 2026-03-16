@@ -1,10 +1,10 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { useParams, useRouter } from 'next/navigation';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { api } from '@/lib/api';
-import Link from 'next/link';
+import { useState } from "react";
+import { useParams, useRouter } from "next/navigation";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { api } from "@/lib/api";
+import Link from "next/link";
 import {
   ArrowLeft,
   Package,
@@ -15,14 +15,13 @@ import {
   Upload,
   Pencil,
   Trash2,
-  Eye,
   ExternalLink,
   ChevronRight,
   AlertCircle,
   CheckCircle,
   Loader2,
-} from 'lucide-react';
-import { formatDistanceToNow, format } from 'date-fns';
+} from "lucide-react";
+import { formatDistanceToNow, format } from "date-fns";
 
 interface AppDetails {
   id: string;
@@ -30,7 +29,7 @@ interface AppDetails {
   name: string;
   description?: string;
   icon?: string;
-  status: 'draft' | 'review' | 'published' | 'rejected';
+  status: "draft" | "review" | "published" | "rejected";
   category: string;
   createdAt: string;
   updatedAt: string;
@@ -43,7 +42,7 @@ interface AppDetails {
   versions: Array<{
     id: string;
     version: string;
-    status: 'active' | 'deprecated';
+    status: "active" | "deprecated";
     downloads: number;
     createdAt: string;
   }>;
@@ -57,69 +56,24 @@ export default function AppDetailPage() {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   const { data: app, isLoading } = useQuery({
-    queryKey: ['app', params.id],
+    queryKey: ["app", params.id],
     queryFn: () => api.get<AppDetails>(`/apps/${params.id}`),
   });
 
   const deleteMutation = useMutation({
     mutationFn: () => api.delete(`/apps/${params.id}`),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['apps'] });
-      router.push('/dashboard/apps');
+      queryClient.invalidateQueries({ queryKey: ["apps"] });
+      router.push("/dashboard/apps");
     },
   });
 
   const publishMutation = useMutation({
     mutationFn: () => api.post(`/apps/${params.id}/publish`, {}),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['app', params.id] });
+      queryClient.invalidateQueries({ queryKey: ["app", params.id] });
     },
   });
-
-  // Mock data for development
-  const mockApp: AppDetails = {
-    id: params.id as string,
-    appId: 'com.example.shop',
-    name: 'QuickShop',
-    description:
-      'QuickShop is your one-stop destination for quick and easy online shopping. Browse thousands of products, enjoy fast checkout, and track your orders in real-time.',
-    status: 'published',
-    category: 'shopping',
-    createdAt: '2024-01-15T10:00:00Z',
-    updatedAt: '2024-03-10T14:30:00Z',
-    stats: {
-      downloads: 5432,
-      activeUsers: 1234,
-      rating: 4.5,
-      reviews: 128,
-    },
-    versions: [
-      {
-        id: 'v3',
-        version: '1.2.3',
-        status: 'active',
-        downloads: 2341,
-        createdAt: '2024-03-10T14:30:00Z',
-      },
-      {
-        id: 'v2',
-        version: '1.2.0',
-        status: 'deprecated',
-        downloads: 1890,
-        createdAt: '2024-02-15T10:00:00Z',
-      },
-      {
-        id: 'v1',
-        version: '1.0.0',
-        status: 'deprecated',
-        downloads: 1201,
-        createdAt: '2024-01-15T10:00:00Z',
-      },
-    ],
-    permissions: ['network', 'storage', 'camera', 'location'],
-  };
-
-  const displayApp = app || mockApp;
 
   if (isLoading) {
     return (
@@ -129,17 +83,36 @@ export default function AppDetailPage() {
     );
   }
 
+  if (!app) {
+    return (
+      <div className="flex flex-col items-center justify-center h-64 text-gray-500">
+        <Package className="h-12 w-12 text-gray-300 mb-3" />
+        <p className="font-medium">App not found</p>
+        <Link
+          href="/dashboard/apps"
+          className="text-sm text-primary-600 hover:underline mt-2"
+        >
+          Back to apps
+        </Link>
+      </div>
+    );
+  }
+
   const statusConfig: Record<
     string,
     { color: string; icon: React.ComponentType<any>; label: string }
   > = {
-    published: { color: 'text-success-600', icon: CheckCircle, label: 'Published' },
-    review: { color: 'text-warning-600', icon: Clock, label: 'In Review' },
-    draft: { color: 'text-gray-500', icon: Pencil, label: 'Draft' },
-    rejected: { color: 'text-error-600', icon: AlertCircle, label: 'Rejected' },
+    published: {
+      color: "text-success-600",
+      icon: CheckCircle,
+      label: "Published",
+    },
+    review: { color: "text-warning-600", icon: Clock, label: "In Review" },
+    draft: { color: "text-gray-500", icon: Pencil, label: "Draft" },
+    rejected: { color: "text-error-600", icon: AlertCircle, label: "Rejected" },
   };
 
-  const StatusIcon = statusConfig[displayApp.status].icon;
+  const StatusIcon = statusConfig[app.status].icon;
 
   return (
     <div className="space-y-6">
@@ -182,7 +155,7 @@ export default function AppDetailPage() {
             <Pencil className="h-4 w-4 mr-2" />
             Edit
           </Link>
-          {displayApp.status === 'draft' && (
+          {displayApp.status === "draft" && (
             <button
               onClick={() => publishMutation.mutate()}
               disabled={publishMutation.isPending}
@@ -202,16 +175,18 @@ export default function AppDetailPage() {
       {/* Status Banner */}
       <div
         className={`flex items-center gap-2 p-4 rounded-lg bg-gray-50 border ${
-          displayApp.status === 'rejected' ? 'border-error-200 bg-error-50' : ''
+          displayApp.status === "rejected" ? "border-error-200 bg-error-50" : ""
         }`}
       >
         <StatusIcon
           className={`h-5 w-5 ${statusConfig[displayApp.status].color}`}
         />
-        <span className={`font-medium ${statusConfig[displayApp.status].color}`}>
+        <span
+          className={`font-medium ${statusConfig[displayApp.status].color}`}
+        >
           {statusConfig[displayApp.status].label}
         </span>
-        {displayApp.status === 'published' && (
+        {displayApp.status === "published" && (
           <a
             href={`apex://${displayApp.appId}`}
             className="ml-auto flex items-center gap-1 text-sm text-primary-600 hover:underline"
@@ -258,7 +233,7 @@ export default function AppDetailPage() {
             </div>
             <div className="card-body">
               <p className="text-gray-600">
-                {displayApp.description || 'No description provided.'}
+                {displayApp.description || "No description provided."}
               </p>
             </div>
           </div>
@@ -283,7 +258,7 @@ export default function AppDetailPage() {
                   <div>
                     <div className="flex items-center gap-2">
                       <span className="font-medium">v{version.version}</span>
-                      {version.status === 'active' ? (
+                      {version.status === "active" ? (
                         <span className="badge-success">Active</span>
                       ) : (
                         <span className="badge text-gray-500 bg-gray-100">
@@ -292,7 +267,7 @@ export default function AppDetailPage() {
                       )}
                     </div>
                     <div className="text-sm text-gray-500 mt-1">
-                      {format(new Date(version.createdAt), 'MMM d, yyyy')} •{' '}
+                      {format(new Date(version.createdAt), "MMM d, yyyy")} •{" "}
                       {version.downloads.toLocaleString()} downloads
                     </div>
                   </div>
@@ -320,7 +295,7 @@ export default function AppDetailPage() {
               <div>
                 <div className="text-sm text-gray-500">Created</div>
                 <div className="font-medium">
-                  {format(new Date(displayApp.createdAt), 'MMM d, yyyy')}
+                  {format(new Date(displayApp.createdAt), "MMM d, yyyy")}
                 </div>
               </div>
               <div>
@@ -397,8 +372,8 @@ export default function AppDetailPage() {
           <div className="bg-white rounded-xl max-w-md w-full mx-4 p-6">
             <h3 className="text-lg font-semibold text-gray-900">Delete App?</h3>
             <p className="text-gray-600 mt-2">
-              Are you sure you want to delete <strong>{displayApp.name}</strong>?
-              This will permanently remove the app and all its data.
+              Are you sure you want to delete <strong>{displayApp.name}</strong>
+              ? This will permanently remove the app and all its data.
             </p>
             <div className="flex gap-3 mt-6">
               <button
@@ -415,7 +390,7 @@ export default function AppDetailPage() {
                 {deleteMutation.isPending ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
                 ) : (
-                  'Delete'
+                  "Delete"
                 )}
               </button>
             </div>
@@ -430,11 +405,11 @@ function StatCard({
   icon: Icon,
   label,
   value,
-}: {
+}: Readonly<{
   icon: React.ComponentType<{ className?: string }>;
   label: string;
   value: string;
-}) {
+}>) {
   return (
     <div className="card p-4">
       <div className="flex items-center gap-3">

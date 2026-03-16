@@ -49,32 +49,7 @@ export default function ApiKeysPage() {
     },
   });
 
-  // Mock data for development
-  const mockKeys: ApiKey[] = [
-    {
-      id: '1',
-      name: 'Production',
-      prefix: 'apex_prod_',
-      lastUsed: '2024-03-14T10:30:00Z',
-      createdAt: '2024-01-15T10:00:00Z',
-    },
-    {
-      id: '2',
-      name: 'Development',
-      prefix: 'apex_dev_',
-      lastUsed: '2024-03-15T08:45:00Z',
-      createdAt: '2024-02-01T14:00:00Z',
-    },
-    {
-      id: '3',
-      name: 'CI/CD Pipeline',
-      prefix: 'apex_ci_',
-      createdAt: '2024-03-01T09:00:00Z',
-      expiresAt: '2024-06-01T00:00:00Z',
-    },
-  ];
-
-  const displayKeys = keys || mockKeys;
+  const displayKeys = keys ?? [];
 
   const copyToClipboard = (text: string, id: string) => {
     navigator.clipboard.writeText(text);
@@ -115,24 +90,26 @@ export default function ApiKeysPage() {
           <div className="p-8 text-center">
             <Loader2 className="h-8 w-8 animate-spin text-primary-500 mx-auto" />
           </div>
-        ) : displayKeys.length === 0 ? (
-          <div className="p-12 text-center">
-            <Key className="h-12 w-12 mx-auto text-gray-300 mb-4" />
-            <h3 className="font-medium text-gray-900 mb-1">No API keys</h3>
-            <p className="text-gray-500 mb-4">
-              Create an API key to use the APEX CLI or integrate with CI/CD
-            </p>
-            <button
-              onClick={() => setShowCreateModal(true)}
-              className="btn-primary"
-            >
-              <Plus className="h-4 w-4 mr-2" />
-              Create Your First API Key
-            </button>
-          </div>
         ) : (
-          <div className="divide-y">
-            {displayKeys.map((key) => (
+          <>
+            {displayKeys.length === 0 ? (
+              <div className="p-12 text-center">
+                <Key className="h-12 w-12 mx-auto text-gray-300 mb-4" />
+                <h3 className="font-medium text-gray-900 mb-1">No API keys</h3>
+                <p className="text-gray-500 mb-4">
+                  Create an API key to use the APEX CLI or integrate with CI/CD
+                </p>
+                <button
+                  onClick={() => setShowCreateModal(true)}
+                  className="btn-primary"
+                >
+                  <Plus className="h-4 w-4 mr-2" />
+                  Create Your First API Key
+                </button>
+              </div>
+            ) : (
+              <div className="divide-y">
+                {displayKeys.map((key) => (
               <div
                 key={key.id}
                 className="p-4 flex items-center justify-between"
@@ -262,11 +239,11 @@ function CreateKeyModal({
   onClose,
   onCreated,
   newKey,
-}: {
+}: Readonly<{
   onClose: () => void;
   onCreated: (key: NewKeyResponse) => void;
   newKey: NewKeyResponse | null;
-}) {
+}>) {
   const [name, setName] = useState('');
   const [showKey, setShowKey] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -305,9 +282,10 @@ function CreateKeyModal({
             </div>
 
             <div className="mt-6">
-              <label className="label">Your API Key</label>
+            <label className="label" htmlFor="new-api-key">Your API Key</label>
               <div className="relative">
                 <input
+                  id="new-api-key"
                   type={showKey ? 'text' : 'password'}
                   value={newKey.key}
                   readOnly
