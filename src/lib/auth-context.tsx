@@ -63,24 +63,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const login = async (email: string, password: string) => {
-    const data = await api.post<{ token: string; user: User }>('/auth/login', {
+    const data = await api.post<{ token: string; developer: User }>('/auth/login', {
       email,
       password,
     });
 
     localStorage.setItem('apex_token', data.token);
-    setUser(data.user);
+    setUser(data.developer);
     router.push('/dashboard');
   };
 
   const register = async (registerData: RegisterData) => {
-    const data = await api.post<{ token: string; user: User }>(
+    const data = await api.post<{ token: string; developer: User }>(
       '/auth/register',
       registerData
     );
 
     localStorage.setItem('apex_token', data.token);
-    setUser(data.user);
+    setUser(data.developer);
     router.push('/dashboard');
   };
 
