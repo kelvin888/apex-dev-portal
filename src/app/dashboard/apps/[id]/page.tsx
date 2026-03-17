@@ -98,6 +98,8 @@ export default function AppDetailPage() {
     );
   }
 
+  const displayApp = app;
+
   const statusConfig: Record<
     string,
     { color: string; icon: React.ComponentType<any>; label: string }
@@ -372,7 +374,8 @@ export default function AppDetailPage() {
           <div className="bg-white rounded-xl max-w-md w-full mx-4 p-6">
             <h3 className="text-lg font-semibold text-gray-900">Delete App?</h3>
             <p className="text-gray-600 mt-2">
-              Are you sure you want to delete <strong>{displayApp.name}</strong>
+              Are you sure you want to delete{' '}
+              <strong>{displayApp.name}</strong>{' '}
               ? This will permanently remove the app and all its data.
             </p>
             <div className="flex gap-3 mt-6">
