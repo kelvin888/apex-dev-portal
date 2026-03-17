@@ -1,9 +1,9 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { api } from '@/lib/api';
-import Link from 'next/link';
+import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { api } from "@/lib/api";
+import Link from "next/link";
 import {
   Plus,
   Search,
@@ -14,8 +14,8 @@ import {
   Trash2,
   Download,
   ExternalLink,
-} from 'lucide-react';
-import { formatDistanceToNow } from 'date-fns';
+} from "lucide-react";
+import { formatDistanceToNow } from "date-fns";
 
 interface App {
   id: string;
@@ -23,7 +23,7 @@ interface App {
   name: string;
   description?: string;
   icon?: string;
-  status: 'draft' | 'pending' | 'approved' | 'rejected' | 'suspended';
+  status: "draft" | "pending" | "approved" | "rejected" | "suspended";
   latestVersion?: string;
   totalDownloads: number;
   rating?: number;
@@ -32,17 +32,18 @@ interface App {
 }
 
 export default function AppsPage() {
-  const [search, setSearch] = useState('');
-  const [filter, setFilter] = useState<string>('all');
+  const [search, setSearch] = useState("");
+  const [filter, setFilter] = useState<string>("all");
 
   const { data: appsResponse, isLoading } = useQuery({
-    queryKey: ['apps', search, filter],
+    queryKey: ["apps", search, filter],
     queryFn: () => {
       const params = new URLSearchParams();
-      if (search) params.set('search', search);
-      if (filter && filter !== 'all') params.set('status', filter);
+      if (search) params.set("search", search);
+      if (filter && filter !== "all") params.set("status", filter);
       const queryString = params.toString();
-      return api.get<{ apps: App[]; total: number }>(`/apps${queryString ? `?${queryString}` : ''}`);
+      const url = queryString ? `/apps?${queryString}` : "/apps";
+      return api.get<{ apps: App[]; total: number }>(url);
     },
   });
 
@@ -71,14 +72,14 @@ export default function AppsPage() {
           />
         </div>
         <div className="flex gap-2">
-          {['all', 'approved', 'pending', 'draft'].map((status) => (
+          {["all", "approved", "pending", "draft"].map((status) => (
             <button
               key={status}
               onClick={() => setFilter(status)}
               className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
                 filter === status
-                  ? 'bg-primary-50 text-primary-600'
-                  : 'text-gray-600 hover:bg-gray-100'
+                  ? "bg-primary-50 text-primary-600"
+                  : "text-gray-600 hover:bg-gray-100"
               }`}
             >
               {status.charAt(0).toUpperCase() + status.slice(1)}
@@ -102,13 +103,14 @@ export default function AppsPage() {
             </div>
           ))}
         </div>
-      ) : filteredApps.length === 0 ? (
+      ) : null}
+      {!isLoading && apps.length === 0 ? (
         <div className="card p-12 text-center">
           <Package className="h-12 w-12 mx-auto text-gray-300 mb-4" />
           <h3 className="font-medium text-gray-900 mb-1">No apps found</h3>
           <p className="text-gray-500 mb-4">
             {search
-              ? 'Try a different search term'
+              ? "Try a different search term"
               : "You haven't created any apps yet"}
           </p>
           <Link href="/dashboard/apps/new" className="btn-primary">
@@ -116,34 +118,35 @@ export default function AppsPage() {
             Create Your First App
           </Link>
         </div>
-      ) : (
+      ) : null}
+      {!isLoading && apps.length > 0 ? (
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {filteredApps.map((app) => (
+          {apps.map((app) => (
             <AppCard key={app.id} app={app} />
           ))}
         </div>
-      )}
+      ) : null}
     </div>
   );
 }
 
-function AppCard({ app }: { app: App }) {
+function AppCard({ app }: Readonly<{ app: App }>) {
   const [menuOpen, setMenuOpen] = useState(false);
 
   const statusColors: Record<string, string> = {
-    approved: 'badge-success',
-    pending: 'badge-warning',
-    draft: 'badge-info',
-    rejected: 'badge-error',
-    suspended: 'badge-error',
+    approved: "badge-success",
+    pending: "badge-warning",
+    draft: "badge-info",
+    rejected: "badge-error",
+    suspended: "badge-error",
   };
 
   const statusLabels: Record<string, string> = {
-    approved: 'Approved',
-    pending: 'Pending Review',
-    draft: 'Draft',
-    rejected: 'Rejected',
-    suspended: 'Suspended',
+    approved: "Approved",
+    pending: "Pending Review",
+    draft: "Draft",
+    rejected: "Rejected",
+    suspended: "Suspended",
   };
 
   return (
@@ -177,9 +180,11 @@ function AppCard({ app }: { app: App }) {
               </button>
               {menuOpen && (
                 <>
-                  <div
-                    className="fixed inset-0 z-10"
+                  <button
+                    aria-label="Close menu"
+                    className="fixed inset-0 z-10 cursor-default bg-transparent border-0"
                     onClick={() => setMenuOpen(false)}
+                    onKeyDown={(e) => e.key === "Escape" && setMenuOpen(false)}
                   />
                   <div className="absolute right-0 mt-1 w-40 bg-white rounded-lg shadow-lg border z-20">
                     <Link
@@ -196,7 +201,7 @@ function AppCard({ app }: { app: App }) {
                       <Pencil className="h-4 w-4" />
                       Edit
                     </Link>
-                    {app.status === 'published' && (
+                    {app.status === "approved" && (
                       <a
                         href={`apex://${app.appId}`}
                         className="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50"
@@ -238,7 +243,8 @@ function AppCard({ app }: { app: App }) {
       </div>
 
       <div className="mt-3 pt-3 border-t text-xs text-gray-400">
-        Updated {formatDistanceToNow(new Date(app.updatedAt), { addSuffix: true })}
+        Updated{" "}
+        {formatDistanceToNow(new Date(app.updatedAt), { addSuffix: true })}
       </div>
     </div>
   );
