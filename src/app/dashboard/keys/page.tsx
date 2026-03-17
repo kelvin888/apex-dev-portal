@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { api } from '@/lib/api';
+import { useState } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { api } from "@/lib/api";
 import {
   Key,
   Plus,
@@ -13,8 +13,8 @@ import {
   AlertCircle,
   Check,
   Loader2,
-} from 'lucide-react';
-import { formatDistanceToNow, format } from 'date-fns';
+} from "lucide-react";
+import { formatDistanceToNow, format } from "date-fns";
 
 interface ApiKey {
   id: string;
@@ -38,14 +38,14 @@ export default function ApiKeysPage() {
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
   const { data: keys, isLoading } = useQuery({
-    queryKey: ['api-keys'],
-    queryFn: () => api.get<ApiKey[]>('/auth/api-keys'),
+    queryKey: ["api-keys"],
+    queryFn: () => api.get<ApiKey[]>("/auth/api-keys"),
   });
 
   const deleteMutation = useMutation({
     mutationFn: (id: string) => api.delete(`/auth/api-keys/${id}`),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['api-keys'] });
+      queryClient.invalidateQueries({ queryKey: ["api-keys"] });
     },
   });
 
@@ -110,74 +110,80 @@ export default function ApiKeysPage() {
             ) : (
               <div className="divide-y">
                 {displayKeys.map((key) => (
-              <div
-                key={key.id}
-                className="p-4 flex items-center justify-between"
-              >
-                <div className="flex items-center gap-4">
-                  <div className="p-2 bg-gray-100 rounded-lg">
-                    <Key className="h-5 w-5 text-gray-600" />
-                  </div>
-                  <div>
-                    <div className="font-medium text-gray-900">{key.name}</div>
-                    <div className="flex items-center gap-2 mt-1">
-                      <code className="text-sm text-gray-500 bg-gray-50 px-2 py-0.5 rounded">
-                        {key.prefix}••••••••
-                      </code>
-                      <button
-                        onClick={() =>
-                          copyToClipboard(`${key.prefix}••••••••`, key.id)
-                        }
-                        className="p-1 rounded hover:bg-gray-100"
-                        title="Copy key prefix"
-                      >
-                        {copiedId === key.id ? (
-                          <Check className="h-4 w-4 text-success-600" />
-                        ) : (
-                          <Copy className="h-4 w-4 text-gray-400" />
+                  <div
+                    key={key.id}
+                    className="p-4 flex items-center justify-between"
+                  >
+                    <div className="flex items-center gap-4">
+                      <div className="p-2 bg-gray-100 rounded-lg">
+                        <Key className="h-5 w-5 text-gray-600" />
+                      </div>
+                      <div>
+                        <div className="font-medium text-gray-900">
+                          {key.name}
+                        </div>
+                        <div className="flex items-center gap-2 mt-1">
+                          <code className="text-sm text-gray-500 bg-gray-50 px-2 py-0.5 rounded">
+                            {key.prefix}••••••••
+                          </code>
+                          <button
+                            onClick={() =>
+                              copyToClipboard(`${key.prefix}••••••••`, key.id)
+                            }
+                            className="p-1 rounded hover:bg-gray-100"
+                            title="Copy key prefix"
+                          >
+                            {copiedId === key.id ? (
+                              <Check className="h-4 w-4 text-success-600" />
+                            ) : (
+                              <Copy className="h-4 w-4 text-gray-400" />
+                            )}
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-6">
+                      <div className="text-sm text-right">
+                        {key.lastUsed && (
+                          <div className="text-gray-500">
+                            Last used{" "}
+                            {formatDistanceToNow(new Date(key.lastUsed), {
+                              addSuffix: true,
+                            })}
+                          </div>
                         )}
+                        <div className="text-gray-400">
+                          Created{" "}
+                          {format(new Date(key.createdAt), "MMM d, yyyy")}
+                        </div>
+                        {key.expiresAt && (
+                          <div className="text-warning-600">
+                            Expires{" "}
+                            {format(new Date(key.expiresAt), "MMM d, yyyy")}
+                          </div>
+                        )}
+                      </div>
+                      <button
+                        onClick={() => {
+                          if (
+                            confirm(
+                              `Are you sure you want to delete "${key.name}"?`,
+                            )
+                          ) {
+                            deleteMutation.mutate(key.id);
+                          }
+                        }}
+                        className="p-2 rounded-lg hover:bg-error-50 text-gray-400 hover:text-error-600"
+                        title="Delete key"
+                      >
+                        <Trash2 className="h-4 w-4" />
                       </button>
                     </div>
                   </div>
-                </div>
-                <div className="flex items-center gap-6">
-                  <div className="text-sm text-right">
-                    {key.lastUsed && (
-                      <div className="text-gray-500">
-                        Last used{' '}
-                        {formatDistanceToNow(new Date(key.lastUsed), {
-                          addSuffix: true,
-                        })}
-                      </div>
-                    )}
-                    <div className="text-gray-400">
-                      Created {format(new Date(key.createdAt), 'MMM d, yyyy')}
-                    </div>
-                    {key.expiresAt && (
-                      <div className="text-warning-600">
-                        Expires {format(new Date(key.expiresAt), 'MMM d, yyyy')}
-                      </div>
-                    )}
-                  </div>
-                  <button
-                    onClick={() => {
-                      if (
-                        confirm(
-                          `Are you sure you want to delete "${key.name}"?`
-                        )
-                      ) {
-                        deleteMutation.mutate(key.id);
-                      }
-                    }}
-                    className="p-2 rounded-lg hover:bg-error-50 text-gray-400 hover:text-error-600"
-                    title="Delete key"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </button>
-                </div>
+                ))}
               </div>
-            ))}
-          </div>
+            )}
+          </>
         )}
       </div>
 
@@ -226,7 +232,7 @@ export default function ApiKeysPage() {
           }}
           onCreated={(key) => {
             setNewKey(key);
-            queryClient.invalidateQueries({ queryKey: ['api-keys'] });
+            queryClient.invalidateQueries({ queryKey: ["api-keys"] });
           }}
           newKey={newKey}
         />
@@ -244,12 +250,12 @@ function CreateKeyModal({
   onCreated: (key: NewKeyResponse) => void;
   newKey: NewKeyResponse | null;
 }>) {
-  const [name, setName] = useState('');
+  const [name, setName] = useState("");
   const [showKey, setShowKey] = useState(false);
   const [copied, setCopied] = useState(false);
 
   const createMutation = useMutation({
-    mutationFn: () => api.post<NewKeyResponse>('/auth/api-keys', { name }),
+    mutationFn: () => api.post<NewKeyResponse>("/auth/api-keys", { name }),
     onSuccess: (data) => {
       onCreated(data);
     },
@@ -282,11 +288,13 @@ function CreateKeyModal({
             </div>
 
             <div className="mt-6">
-            <label className="label" htmlFor="new-api-key">Your API Key</label>
+              <label className="label" htmlFor="new-api-key">
+                Your API Key
+              </label>
               <div className="relative">
                 <input
                   id="new-api-key"
-                  type={showKey ? 'text' : 'password'}
+                  type={showKey ? "text" : "password"}
                   value={newKey.key}
                   readOnly
                   className="input pr-20 font-mono text-sm"
@@ -318,8 +326,8 @@ function CreateKeyModal({
 
             <div className="bg-warning-50 border border-warning-100 rounded-lg p-3 mt-4">
               <p className="text-sm text-warning-800">
-                <strong>Important:</strong> This is the only time you'll see this
-                key. Store it securely.
+                <strong>Important:</strong> This is the only time you'll see
+                this key. Store it securely.
               </p>
             </div>
 
@@ -353,7 +361,8 @@ function CreateKeyModal({
 
             {createMutation.isError && (
               <div className="bg-error-50 border border-error-100 text-error-600 px-4 py-3 rounded-lg text-sm mt-4">
-                {(createMutation.error as any)?.message || 'Failed to create key'}
+                {(createMutation.error as any)?.message ||
+                  "Failed to create key"}
               </div>
             )}
 
@@ -369,7 +378,7 @@ function CreateKeyModal({
                 {createMutation.isPending ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
                 ) : (
-                  'Create Key'
+                  "Create Key"
                 )}
               </button>
             </div>
