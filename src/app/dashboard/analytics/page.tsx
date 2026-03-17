@@ -1,9 +1,9 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { api } from '@/lib/api';
-import { Download, Users, TrendingUp, Clock, BarChart2 } from 'lucide-react';
+import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { api } from "@/lib/api";
+import { Download, Users, TrendingUp, Clock, BarChart2 } from "lucide-react";
 import {
   AreaChart,
   Area,
@@ -12,28 +12,32 @@ import {
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
-} from 'recharts';
+} from "recharts";
 
-type Period = '7d' | '30d' | '90d';
+type Period = "7d" | "30d" | "90d";
 
-interface ChartData { date: string; downloads: number; users: number; }
+interface ChartData {
+  date: string;
+  downloads: number;
+  users: number;
+}
 interface DashboardStats {
   totalDownloads: number;
   activeUsers: number;
-  changes: { downloads: number; users: number; };
+  changes: { downloads: number; users: number };
 }
 
 export default function AnalyticsPage() {
-  const [period, setPeriod] = useState<Period>('30d');
+  const [period, setPeriod] = useState<Period>("30d");
 
   const { data: stats } = useQuery({
-    queryKey: ['dashboard-stats'],
-    queryFn: () => api.get<DashboardStats>('/dashboard/stats'),
+    queryKey: ["dashboard-stats"],
+    queryFn: () => api.get<DashboardStats>("/dashboard/stats"),
   });
 
   const { data: chartData } = useQuery({
-    queryKey: ['dashboard-chart'],
-    queryFn: () => api.get<ChartData[]>('/dashboard/chart'),
+    queryKey: ["dashboard-chart"],
+    queryFn: () => api.get<ChartData[]>("/dashboard/chart"),
   });
 
   const downloads = chartData ?? [];
@@ -46,22 +50,26 @@ export default function AnalyticsPage() {
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-gray-900">Analytics</h1>
         <div className="flex gap-2 bg-gray-100 p-1 rounded-lg">
-          {(['7d', '30d', '90d'] as Period[]).map((p) => {
-            const PERIOD_LABELS: Record<Period, string> = { '7d': '7 Days', '30d': '30 Days', '90d': '90 Days' };
+          {(["7d", "30d", "90d"] as Period[]).map((p) => {
+            const PERIOD_LABELS: Record<Period, string> = {
+              "7d": "7 Days",
+              "30d": "30 Days",
+              "90d": "90 Days",
+            };
             return (
               <button
                 key={p}
                 onClick={() => setPeriod(p)}
                 className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
                   period === p
-                    ? 'bg-white text-gray-900 shadow-sm'
-                    : 'text-gray-600 hover:text-gray-900'
+                    ? "bg-white text-gray-900 shadow-sm"
+                    : "text-gray-600 hover:text-gray-900"
                 }`}
               >
                 {PERIOD_LABELS[p]}
               </button>
             );
-          ))}
+          })}
         </div>
       </div>
 
@@ -79,18 +87,8 @@ export default function AnalyticsPage() {
           value={activeUsers.toLocaleString()}
           change={0}
         />
-        <StatCard
-          icon={TrendingUp}
-          title="Avg. Session"
-          value="—"
-          noChange
-        />
-        <StatCard
-          icon={Clock}
-          title="Retention"
-          value="—"
-          noChange
-        />
+        <StatCard icon={TrendingUp} title="Avg. Session" value="—" noChange />
+        <StatCard icon={Clock} title="Retention" value="—" noChange />
       </div>
 
       {/* Downloads Trend */}
@@ -106,7 +104,13 @@ export default function AnalyticsPage() {
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={downloads}>
                   <defs>
-                    <linearGradient id="colorDownloads" x1="0" y1="0" x2="0" y2="1">
+                    <linearGradient
+                      id="colorDownloads"
+                      x1="0"
+                      y1="0"
+                      x2="0"
+                      y2="1"
+                    >
                       <stop offset="5%" stopColor="#1890ff" stopOpacity={0.3} />
                       <stop offset="95%" stopColor="#1890ff" stopOpacity={0} />
                     </linearGradient>
@@ -175,8 +179,11 @@ function StatCard({
           <Icon className="h-5 w-5 text-primary-600" />
         </div>
         {!noChange && change !== undefined && change !== 0 && (
-          <span className={`text-sm ${isPositive ? 'text-success-600' : 'text-error-600'}`}>
-            {isPositive ? '+' : ''}{change}%
+          <span
+            className={`text-sm ${isPositive ? "text-success-600" : "text-error-600"}`}
+          >
+            {isPositive ? "+" : ""}
+            {change}%
           </span>
         )}
       </div>
@@ -184,7 +191,9 @@ function StatCard({
         <div className="text-2xl font-bold text-gray-900">{value}</div>
         <div className="text-sm text-gray-500">{title}</div>
       </div>
-      {!noChange && <div className="text-xs text-gray-400 mt-2">vs last 30 days</div>}
+      {!noChange && (
+        <div className="text-xs text-gray-400 mt-2">vs last 30 days</div>
+      )}
     </div>
   );
 }
@@ -198,7 +207,10 @@ function EmptyChart({ message }: Readonly<{ message: string }>) {
   );
 }
 
-function ComingSoonCard({ title, description }: Readonly<{ title: string; description: string }>) {
+function ComingSoonCard({
+  title,
+  description,
+}: Readonly<{ title: string; description: string }>) {
   return (
     <div className="card">
       <div className="card-header">
