@@ -300,7 +300,10 @@ function AppCard({ app }: Readonly<{ app: App }>) {
       {showDeleteConfirm && (
         <div
           className="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
-          onClick={() => setShowDeleteConfirm(false)}
+          onClick={() => {
+            setShowDeleteConfirm(false);
+            deleteMutation.reset();
+          }}
         >
           <div
             className="bg-white rounded-xl max-w-md w-full mx-4 p-6"
@@ -319,9 +322,17 @@ function AppCard({ app }: Readonly<{ app: App }>) {
               <strong>{app.name}</strong>? All versions and data will be
               removed. This cannot be undone.
             </p>
+            {deleteMutation.isError && (
+              <div className="mt-4 p-3 bg-error-50 border border-error-200 rounded-lg text-sm text-error-700">
+                {(deleteMutation.error as Error).message}
+              </div>
+            )}
             <div className="flex gap-3 mt-6">
               <button
-                onClick={() => setShowDeleteConfirm(false)}
+                onClick={() => {
+                  setShowDeleteConfirm(false);
+                  deleteMutation.reset();
+                }}
                 className="btn-secondary flex-1"
                 disabled={deleteMutation.isPending}
               >
