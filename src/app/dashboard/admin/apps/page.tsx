@@ -288,6 +288,15 @@ export default function AdminAppsPage() {
                           Review
                         </button>
                       )}
+                      {app.status !== "pending" && app.status !== "draft" && (
+                        <button
+                          onClick={() => setReviewApp(app)}
+                          className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+                        >
+                          <CheckCircle className="h-3 w-3" />
+                          Manage
+                        </button>
+                      )}
                     </td>
                   </tr>
                 ))}

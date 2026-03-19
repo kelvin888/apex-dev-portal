@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/lib/api";
 import { useRoleGuard } from "@/lib/auth-context";
 import Link from "next/link";
@@ -15,6 +15,8 @@ import {
   Trash2,
   Download,
   ExternalLink,
+  EyeOff,
+  Loader2,
 } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 
@@ -134,6 +136,33 @@ export default function AppsPage() {
 
 function AppCard({ app }: Readonly<{ app: App }>) {
   const [menuOpen, setMenuOpen] = useState(false);
+  const queryClient = useQueryClient();
+
+  const unpublishMutation = useMutation({
+    mutationFn: () => api.post(`/apps/${app.id}/unpublish`, {}),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["apps"] });
+      setMenuOpen(false);
+    },
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: () => api.delete(`/apps/${app.id}`),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["apps"] });
+      setMenuOpen(false);
+    },
+  });
+
+  const handleDelete = () => {
+    if (
+      globalThis.confirm(
+        `Permanently delete "${app.name}"? This cannot be undone.`,
+      )
+    ) {
+      deleteMutation.mutate();
+    }
+  };
 
   const statusColors: Record<string, string> = {
     approved: "badge-success",
@@ -188,7 +217,7 @@ function AppCard({ app }: Readonly<{ app: App }>) {
                     onClick={() => setMenuOpen(false)}
                     onKeyDown={(e) => e.key === "Escape" && setMenuOpen(false)}
                   />
-                  <div className="absolute right-0 mt-1 w-40 bg-white rounded-lg shadow-lg border z-20">
+                  <div className="absolute right-0 mt-1 w-44 bg-white rounded-lg shadow-lg border z-20">
                     <Link
                       href={`/dashboard/apps/${app.id}`}
                       className="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50"
@@ -212,8 +241,30 @@ function AppCard({ app }: Readonly<{ app: App }>) {
                         Open in App
                       </a>
                     )}
-                    <button className="w-full flex items-center gap-2 px-3 py-2 text-sm text-error-600 hover:bg-error-50">
-                      <Trash2 className="h-4 w-4" />
+                    {app.status === "approved" && (
+                      <button
+                        className="w-full flex items-center gap-2 px-3 py-2 text-sm text-warning-600 hover:bg-warning-50 disabled:opacity-50"
+                        disabled={unpublishMutation.isPending}
+                        onClick={() => unpublishMutation.mutate()}
+                      >
+                        {unpublishMutation.isPending ? (
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                        ) : (
+                          <EyeOff className="h-4 w-4" />
+                        )}
+                        Unpublish
+                      </button>
+                    )}
+                    <button
+                      className="w-full flex items-center gap-2 px-3 py-2 text-sm text-error-600 hover:bg-error-50 disabled:opacity-50"
+                      disabled={deleteMutation.isPending}
+                      onClick={handleDelete}
+                    >
+                      {deleteMutation.isPending ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        <Trash2 className="h-4 w-4" />
+                      )}
                       Delete
                     </button>
                   </div>
