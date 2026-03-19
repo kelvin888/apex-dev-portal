@@ -52,7 +52,14 @@ interface RecentApp {
   appId: string;
   icon?: string;
   totalDownloads: number;
-  status: "published" | "review" | "draft" | "approved" | "pending" | "rejected" | "suspended";
+  status:
+    | "published"
+    | "review"
+    | "draft"
+    | "approved"
+    | "pending"
+    | "rejected"
+    | "suspended";
 }
 
 interface AdminApp {
