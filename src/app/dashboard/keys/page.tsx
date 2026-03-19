@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/lib/api";
+import { useRoleGuard } from "@/lib/auth-context";
 import {
   Key,
   Plus,
@@ -32,6 +33,7 @@ interface NewKeyResponse {
 }
 
 export default function ApiKeysPage() {
+  useRoleGuard("developer");
   const queryClient = useQueryClient();
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [newKey, setNewKey] = useState<NewKeyResponse | null>(null);

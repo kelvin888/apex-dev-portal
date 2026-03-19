@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { api } from "@/lib/api";
+import { useRoleGuard } from "@/lib/auth-context";
 import { Download, Users, TrendingUp, Clock, BarChart2 } from "lucide-react";
 import {
   AreaChart,
@@ -28,6 +29,7 @@ interface DashboardStats {
 }
 
 export default function AnalyticsPage() {
+  useRoleGuard("developer");
   const [period, setPeriod] = useState<Period>("30d");
 
   const { data: stats } = useQuery({

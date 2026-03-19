@@ -1,50 +1,52 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { useMutation } from '@tanstack/react-query';
-import { api } from '@/lib/api';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
-import { ArrowLeft, Loader2, Upload, Info } from 'lucide-react';
-import Link from 'next/link';
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useMutation } from "@tanstack/react-query";
+import { api } from "@/lib/api";
+import { useRoleGuard } from "@/lib/auth-context";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { ArrowLeft, Loader2, Upload, Info } from "lucide-react";
+import Link from "next/link";
 
 const schema = z.object({
   name: z
     .string()
-    .min(2, 'Name must be at least 2 characters')
-    .max(50, 'Name must be less than 50 characters'),
+    .min(2, "Name must be at least 2 characters")
+    .max(50, "Name must be less than 50 characters"),
   appId: z
     .string()
     .regex(
       /^[a-z][a-z0-9]*(\.[a-z][a-z0-9]*){2,}$/,
-      'Must be in reverse domain format (e.g., com.company.app)'
+      "Must be in reverse domain format (e.g., com.company.app)",
     ),
   description: z
     .string()
-    .max(500, 'Description must be less than 500 characters')
+    .max(500, "Description must be less than 500 characters")
     .optional(),
-  category: z.string().min(1, 'Please select a category'),
+  category: z.string().min(1, "Please select a category"),
 });
 
 type FormData = z.infer<typeof schema>;
 
 const categories = [
-  { value: 'shopping', label: 'Shopping & E-commerce' },
-  { value: 'food', label: 'Food & Delivery' },
-  { value: 'finance', label: 'Finance & Payments' },
-  { value: 'entertainment', label: 'Entertainment' },
-  { value: 'travel', label: 'Travel & Transport' },
-  { value: 'health', label: 'Health & Fitness' },
-  { value: 'education', label: 'Education' },
-  { value: 'utilities', label: 'Utilities' },
-  { value: 'social', label: 'Social & Communication' },
-  { value: 'business', label: 'Business & Productivity' },
-  { value: 'other', label: 'Other' },
+  { value: "shopping", label: "Shopping & E-commerce" },
+  { value: "food", label: "Food & Delivery" },
+  { value: "finance", label: "Finance & Payments" },
+  { value: "entertainment", label: "Entertainment" },
+  { value: "travel", label: "Travel & Transport" },
+  { value: "health", label: "Health & Fitness" },
+  { value: "education", label: "Education" },
+  { value: "utilities", label: "Utilities" },
+  { value: "social", label: "Social & Communication" },
+  { value: "business", label: "Business & Productivity" },
+  { value: "other", label: "Other" },
 ];
 
 export default function NewAppPage() {
+  useRoleGuard("developer");
   const router = useRouter();
   const [iconPreview, setIconPreview] = useState<string | null>(null);
 
@@ -57,35 +59,35 @@ export default function NewAppPage() {
   } = useForm<FormData>({
     resolver: zodResolver(schema),
     defaultValues: {
-      name: '',
-      appId: '',
-      description: '',
-      category: '',
+      name: "",
+      appId: "",
+      description: "",
+      category: "",
     },
   });
 
   const mutation = useMutation({
-    mutationFn: (data: FormData) => api.post('/apps', data),
+    mutationFn: (data: FormData) => api.post("/apps", data),
     onSuccess: (data: any) => {
       router.push(`/dashboard/apps/${data.id}`);
     },
   });
 
-  const name = watch('name');
+  const name = watch("name");
 
   // Auto-generate appId from name
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newName = e.target.value;
-    const currentAppId = watch('appId');
+    const currentAppId = watch("appId");
 
     // Only auto-generate if appId is empty or was auto-generated before
-    if (!currentAppId || currentAppId.startsWith('com.apex.')) {
+    if (!currentAppId || currentAppId.startsWith("com.apex.")) {
       const slug = newName
         .toLowerCase()
-        .replace(/[^a-z0-9]+/g, '')
+        .replace(/[^a-z0-9]+/g, "")
         .slice(0, 20);
       if (slug) {
-        setValue('appId', `com.apex.${slug}`);
+        setValue("appId", `com.apex.${slug}`);
       }
     }
   };
@@ -119,7 +121,9 @@ export default function NewAppPage() {
 
       <div className="card">
         <div className="card-header">
-          <h1 className="text-xl font-semibold text-gray-900">Create New App</h1>
+          <h1 className="text-xl font-semibold text-gray-900">
+            Create New App
+          </h1>
           <p className="text-sm text-gray-500 mt-1">
             Fill in the details to create your new mini-app
           </p>
@@ -128,7 +132,7 @@ export default function NewAppPage() {
         <form onSubmit={handleSubmit(onSubmit)} className="card-body space-y-6">
           {mutation.isError && (
             <div className="bg-error-50 border border-error-100 text-error-600 px-4 py-3 rounded-lg text-sm">
-              {(mutation.error as any)?.message || 'Failed to create app'}
+              {(mutation.error as any)?.message || "Failed to create app"}
             </div>
           )}
 
@@ -172,12 +176,14 @@ export default function NewAppPage() {
             <input
               id="name"
               type="text"
-              {...register('name', { onChange: handleNameChange })}
-              className={`input ${errors.name ? 'border-error-500' : ''}`}
+              {...register("name", { onChange: handleNameChange })}
+              className={`input ${errors.name ? "border-error-500" : ""}`}
               placeholder="My Awesome App"
             />
             {errors.name && (
-              <p className="text-sm text-error-500 mt-1">{errors.name.message}</p>
+              <p className="text-sm text-error-500 mt-1">
+                {errors.name.message}
+              </p>
             )}
           </div>
 
@@ -189,14 +195,16 @@ export default function NewAppPage() {
             <input
               id="appId"
               type="text"
-              {...register('appId')}
+              {...register("appId")}
               className={`input font-mono text-sm ${
-                errors.appId ? 'border-error-500' : ''
+                errors.appId ? "border-error-500" : ""
               }`}
               placeholder="com.company.appname"
             />
             {errors.appId ? (
-              <p className="text-sm text-error-500 mt-1">{errors.appId.message}</p>
+              <p className="text-sm text-error-500 mt-1">
+                {errors.appId.message}
+              </p>
             ) : (
               <p className="text-xs text-gray-500 mt-1 flex items-center gap-1">
                 <Info className="h-3 w-3" />
@@ -212,8 +220,8 @@ export default function NewAppPage() {
             </label>
             <select
               id="category"
-              {...register('category')}
-              className={`input ${errors.category ? 'border-error-500' : ''}`}
+              {...register("category")}
+              className={`input ${errors.category ? "border-error-500" : ""}`}
             >
               <option value="">Select a category</option>
               {categories.map((cat) => (
@@ -236,10 +244,10 @@ export default function NewAppPage() {
             </label>
             <textarea
               id="description"
-              {...register('description')}
+              {...register("description")}
               rows={4}
               className={`input resize-none ${
-                errors.description ? 'border-error-500' : ''
+                errors.description ? "border-error-500" : ""
               }`}
               placeholder="Describe what your app does..."
             />
@@ -249,7 +257,7 @@ export default function NewAppPage() {
               </p>
             )}
             <p className="text-xs text-gray-500 mt-1">
-              {(watch('description') || '').length}/500 characters
+              {(watch("description") || "").length}/500 characters
             </p>
           </div>
 
@@ -269,7 +277,7 @@ export default function NewAppPage() {
                   Creating...
                 </>
               ) : (
-                'Create App'
+                "Create App"
               )}
             </button>
           </div>

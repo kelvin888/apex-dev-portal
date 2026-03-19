@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { api } from "@/lib/api";
+import { useRoleGuard } from "@/lib/auth-context";
 import Link from "next/link";
 import {
   Plus,
@@ -32,6 +33,7 @@ interface App {
 }
 
 export default function AppsPage() {
+  useRoleGuard("developer");
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState<string>("all");
 

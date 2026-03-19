@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import {
   createContext,
@@ -6,16 +6,16 @@ import {
   useState,
   useEffect,
   type ReactNode,
-} from 'react';
-import { useRouter } from 'next/navigation';
-import { api } from './api';
+} from "react";
+import { useRouter } from "next/navigation";
+import { api } from "./api";
 
 interface User {
   id: string;
   email: string;
   name: string;
   company?: string;
-  role: 'developer' | 'admin';
+  role: "developer" | "admin";
   createdAt: string;
 }
 
@@ -43,7 +43,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     // Check for existing session
-    const token = localStorage.getItem('apex_token');
+    const token = localStorage.getItem("apex_token");
     if (token) {
       fetchUser();
     } else {
@@ -53,41 +53,44 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const fetchUser = async () => {
     try {
-      const data = await api.get<User>('/auth/me');
+      const data = await api.get<User>("/auth/me");
       setUser(data);
     } catch (error) {
-      localStorage.removeItem('apex_token');
+      localStorage.removeItem("apex_token");
     } finally {
       setIsLoading(false);
     }
   };
 
   const login = async (email: string, password: string) => {
-    const data = await api.post<{ token: string; developer: User }>('/auth/login', {
-      email,
-      password,
-    });
+    const data = await api.post<{ token: string; developer: User }>(
+      "/auth/login",
+      {
+        email,
+        password,
+      },
+    );
 
-    localStorage.setItem('apex_token', data.token);
+    localStorage.setItem("apex_token", data.token);
     setUser(data.developer);
-    router.push('/dashboard');
+    router.push("/dashboard");
   };
 
   const register = async (registerData: RegisterData) => {
     const data = await api.post<{ token: string; developer: User }>(
-      '/auth/register',
-      registerData
+      "/auth/register",
+      registerData,
     );
 
-    localStorage.setItem('apex_token', data.token);
+    localStorage.setItem("apex_token", data.token);
     setUser(data.developer);
-    router.push('/dashboard');
+    router.push("/dashboard");
   };
 
   const logout = () => {
-    localStorage.removeItem('apex_token');
+    localStorage.removeItem("apex_token");
     setUser(null);
-    router.push('/login');
+    router.push("/login");
   };
 
   return (
@@ -100,7 +103,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 export function useAuth() {
   const context = useContext(AuthContext);
   if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
+}
+
+/**
+ * Redirect to /dashboard if the authenticated user's role doesn't match.
+ * Call this at the top of any page/layout that is role-exclusive.
+ */
+export function useRoleGuard(allowedRole: "admin" | "developer") {
+  const { user, isLoading } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!isLoading && user && user.role !== allowedRole) {
+      router.replace("/dashboard");
+    }
+  }, [user, isLoading, allowedRole, router]);
 }

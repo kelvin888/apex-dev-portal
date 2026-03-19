@@ -2,6 +2,7 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { api } from "@/lib/api";
+import { useRoleGuard } from "@/lib/auth-context";
 import { CreditCard, Zap, ArrowUpRight, Check, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { format } from "date-fns";
@@ -62,6 +63,7 @@ function PriceDisplay({ price }: Readonly<{ price: number | null }>) {
 }
 
 export default function BillingPage() {
+  useRoleGuard("developer");
   const { data: billing, isLoading } = useQuery({
     queryKey: ["billing"],
     queryFn: () => api.get<BillingInfo>("/billing"),
