@@ -19,8 +19,8 @@ import { formatDistanceToNow, format } from "date-fns";
 interface ApiKey {
   id: string;
   name: string;
-  prefix: string;
-  lastUsed?: string;
+  keyPrefix: string;
+  lastUsedAt?: string;
   createdAt: string;
   expiresAt?: string;
 }
@@ -49,7 +49,7 @@ export default function ApiKeysPage() {
     },
   });
 
-  const displayKeys = keysData?.keys ?? [];
+  const displayKeys = Array.isArray(keysData?.keys) ? keysData!.keys : Array.isArray(keysData) ? keysData as unknown as ApiKey[] : [];
 
   const copyToClipboard = (text: string, id: string) => {
     navigator.clipboard.writeText(text);
@@ -124,11 +124,11 @@ export default function ApiKeysPage() {
                         </div>
                         <div className="flex items-center gap-2 mt-1">
                           <code className="text-sm text-gray-500 bg-gray-50 px-2 py-0.5 rounded">
-                            {key.prefix}••••••••
+                            {key.keyPrefix}••••••••
                           </code>
                           <button
                             onClick={() =>
-                              copyToClipboard(`${key.prefix}••••••••`, key.id)
+                              copyToClipboard(`${key.keyPrefix}••••••••`, key.id)
                             }
                             className="p-1 rounded hover:bg-gray-100"
                             title="Copy key prefix"
@@ -144,10 +144,10 @@ export default function ApiKeysPage() {
                     </div>
                     <div className="flex items-center gap-6">
                       <div className="text-sm text-right">
-                        {key.lastUsed && (
+                        {key.lastUsedAt && (
                           <div className="text-gray-500">
                             Last used{" "}
-                            {formatDistanceToNow(new Date(key.lastUsed), {
+                            {formatDistanceToNow(new Date(key.lastUsedAt), {
                               addSuffix: true,
                             })}
                           </div>
@@ -255,7 +255,7 @@ function CreateKeyModal({
   const [copied, setCopied] = useState(false);
 
   const createMutation = useMutation({
-    mutationFn: () => api.post<NewKeyResponse>("/auth/api-keys", { name }),
+    mutationFn: () => api.post<NewKeyResponse>("/auth/api-keys", { name, permissions: ['read', 'upload', 'publish', 'delete'] }),
     onSuccess: (data) => {
       onCreated(data);
     },
