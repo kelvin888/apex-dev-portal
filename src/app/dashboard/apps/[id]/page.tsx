@@ -120,7 +120,11 @@ export default function AppDetailPage() {
     pending: { color: "text-warning-600", icon: Clock, label: "In Review" },
     draft: { color: "text-gray-500", icon: Pencil, label: "Draft" },
     rejected: { color: "text-error-600", icon: AlertCircle, label: "Rejected" },
-    suspended: { color: "text-error-600", icon: AlertCircle, label: "Suspended" },
+    suspended: {
+      color: "text-error-600",
+      icon: AlertCircle,
+      label: "Suspended",
+    },
   };
 
   const StatusIcon = statusConfig[app.status].icon;
@@ -166,7 +170,8 @@ export default function AppDetailPage() {
             <Pencil className="h-4 w-4 mr-2" />
             Edit
           </Link>
-          {(displayApp.status === "draft" || displayApp.status === "rejected") && (
+          {(displayApp.status === "draft" ||
+            displayApp.status === "rejected") && (
             <button
               onClick={() => submitMutation.mutate()}
               disabled={submitMutation.isPending}
