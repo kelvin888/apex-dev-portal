@@ -60,7 +60,7 @@ function ReviewModal({ app, onClose }: Readonly<ReviewModalProps>) {
 
   const mutation = useMutation({
     mutationFn: ({ act, n }: { act: "approve" | "reject"; n: string }) =>
-      api.patch(`/admin/apps/${app.id}/review`, { action: act, notes: n }),
+      api.patch(`/admin/apps/${app.appId}/review`, { action: act, notes: n }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-apps"] });
       queryClient.invalidateQueries({ queryKey: ["admin-pending-apps"] });
