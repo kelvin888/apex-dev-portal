@@ -51,8 +51,8 @@ interface RecentApp {
   name: string;
   appId: string;
   icon?: string;
-  downloads: number;
-  status: "published" | "review" | "draft";
+  totalDownloads: number;
+  status: "published" | "review" | "draft" | "approved" | "pending" | "rejected" | "suspended";
 }
 
 interface AdminApp {
@@ -411,7 +411,7 @@ function DeveloperDashboard() {
                       {app.name}
                     </div>
                     <div className="text-sm text-gray-500">
-                      {app.downloads.toLocaleString()} downloads
+                      {(app.totalDownloads ?? 0).toLocaleString()} downloads
                     </div>
                   </div>
                   <StatusBadge status={app.status} />
