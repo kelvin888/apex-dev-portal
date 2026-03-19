@@ -1,54 +1,55 @@
-import Link from 'next/link';
-import { Check } from 'lucide-react';
+import Link from "next/link";
+import { Check } from "lucide-react";
 
 const plans = [
   {
-    name: 'Free',
+    name: "Free",
     price: 0,
-    description: 'Perfect for side projects and experimentation.',
-    cta: 'Start for Free',
-    ctaHref: '/register',
+    description: "Perfect for side projects and experimentation.",
+    cta: "Start for Free",
+    ctaHref: "/register",
     highlighted: false,
     features: [
-      '5 published apps',
-      '10,000 downloads / month',
-      'Basic analytics',
-      'Community support',
-      'APEX CLI access',
+      "5 published apps",
+      "10,000 downloads / month",
+      "Basic analytics",
+      "Community support",
+      "APEX CLI access",
     ],
   },
   {
-    name: 'Pro',
+    name: "Pro",
     price: 29,
-    description: 'For indie developers and small teams shipping production apps.',
-    cta: 'Start Pro Trial',
-    ctaHref: '/register',
+    description:
+      "For indie developers and small teams shipping production apps.",
+    cta: "Start Pro Trial",
+    ctaHref: "/register",
     highlighted: true,
     features: [
-      'Unlimited apps',
-      '500,000 downloads / month',
-      'Advanced analytics & export',
-      'Priority support',
-      'Custom domains',
-      'Webhook integrations',
-      'Team members (up to 5)',
+      "Unlimited apps",
+      "500,000 downloads / month",
+      "Advanced analytics & export",
+      "Priority support",
+      "Custom domains",
+      "Webhook integrations",
+      "Team members (up to 5)",
     ],
   },
   {
-    name: 'Enterprise',
+    name: "Enterprise",
     price: null,
-    description: 'Custom solutions for large organisations and platforms.',
-    cta: 'Contact Sales',
-    ctaHref: '/support',
+    description: "Custom solutions for large organisations and platforms.",
+    cta: "Contact Sales",
+    ctaHref: "/support",
     highlighted: false,
     features: [
-      'Everything in Pro',
-      'Unlimited downloads',
-      'SLA guarantee',
-      'Dedicated support engineer',
-      'SSO / SAML',
-      'Audit logs',
-      'On-premise deployment option',
+      "Everything in Pro",
+      "Unlimited downloads",
+      "SLA guarantee",
+      "Dedicated support engineer",
+      "SSO / SAML",
+      "Audit logs",
+      "On-premise deployment option",
     ],
   },
 ];
@@ -66,10 +67,18 @@ export default function PricingPage() {
               <span className="font-semibold text-lg">APEX</span>
             </Link>
             <nav className="hidden md:flex items-center gap-6">
-              <Link href="/docs" className="text-gray-600 hover:text-gray-900">Docs</Link>
-              <Link href="/pricing" className="text-primary-600 font-medium">Pricing</Link>
-              <Link href="/login" className="text-gray-600 hover:text-gray-900">Sign In</Link>
-              <Link href="/register" className="btn-primary">Get Started</Link>
+              <Link href="/docs" className="text-gray-600 hover:text-gray-900">
+                Docs
+              </Link>
+              <Link href="/pricing" className="text-primary-600 font-medium">
+                Pricing
+              </Link>
+              <Link href="/login" className="text-gray-600 hover:text-gray-900">
+                Sign In
+              </Link>
+              <Link href="/register" className="btn-primary">
+                Get Started
+              </Link>
             </nav>
           </div>
         </div>
@@ -77,7 +86,9 @@ export default function PricingPage() {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="text-center mb-16">
-          <h1 className="text-4xl font-bold text-gray-900">Simple, transparent pricing</h1>
+          <h1 className="text-4xl font-bold text-gray-900">
+            Simple, transparent pricing
+          </h1>
           <p className="mt-4 text-lg text-gray-600 max-w-2xl mx-auto">
             Start free, scale as you grow. No hidden fees.
           </p>
@@ -89,8 +100,8 @@ export default function PricingPage() {
               key={plan.name}
               className={`rounded-2xl p-8 border-2 ${
                 plan.highlighted
-                  ? 'border-primary-500 bg-white shadow-lg relative'
-                  : 'border-gray-200 bg-white'
+                  ? "border-primary-500 bg-white shadow-lg relative"
+                  : "border-gray-200 bg-white"
               }`}
             >
               {plan.highlighted && (
@@ -106,11 +117,17 @@ export default function PricingPage() {
                 <p className="text-sm text-gray-500 mt-1">{plan.description}</p>
                 <div className="mt-4">
                   {plan.price === null ? (
-                    <span className="text-3xl font-bold text-gray-900">Custom</span>
+                    <span className="text-3xl font-bold text-gray-900">
+                      Custom
+                    </span>
                   ) : (
                     <>
-                      <span className="text-4xl font-bold text-gray-900">${plan.price}</span>
-                      {plan.price > 0 && <span className="text-gray-500 ml-1">/month</span>}
+                      <span className="text-4xl font-bold text-gray-900">
+                        ${plan.price}
+                      </span>
+                      {plan.price > 0 && (
+                        <span className="text-gray-500 ml-1">/month</span>
+                      )}
                     </>
                   )}
                 </div>
@@ -120,8 +137,8 @@ export default function PricingPage() {
                 href={plan.ctaHref}
                 className={`block text-center py-2.5 rounded-lg font-medium transition-colors mb-8 ${
                   plan.highlighted
-                    ? 'bg-primary-500 text-white hover:bg-primary-600'
-                    : 'bg-gray-100 text-gray-900 hover:bg-gray-200'
+                    ? "bg-primary-500 text-white hover:bg-primary-600"
+                    : "bg-gray-100 text-gray-900 hover:bg-gray-200"
                 }`}
               >
                 {plan.cta}
@@ -129,7 +146,10 @@ export default function PricingPage() {
 
               <ul className="space-y-3">
                 {plan.features.map((feature) => (
-                  <li key={feature} className="flex items-start gap-2 text-sm text-gray-700">
+                  <li
+                    key={feature}
+                    className="flex items-start gap-2 text-sm text-gray-700"
+                  >
                     <Check className="h-4 w-4 text-success-600 mt-0.5 flex-shrink-0" />
                     {feature}
                   </li>
@@ -140,8 +160,10 @@ export default function PricingPage() {
         </div>
 
         <p className="text-center text-sm text-gray-500 mt-12">
-          All plans include access to the APEX CLI, SDK, and developer portal.{' '}
-          <Link href="/support" className="text-primary-600 hover:underline">Questions? Talk to us.</Link>
+          All plans include access to the APEX CLI, SDK, and developer portal.{" "}
+          <Link href="/support" className="text-primary-600 hover:underline">
+            Questions? Talk to us.
+          </Link>
         </p>
       </div>
     </div>

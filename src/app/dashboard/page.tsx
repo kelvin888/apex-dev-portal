@@ -106,7 +106,7 @@ export default function DashboardPage() {
           change={displayStats.changes.downloads}
           icon={Download}
         />
-        {user?.role === 'admin' && (
+        {user?.role === "admin" && (
           <StatCard
             title="Active Users"
             value={displayStats.activeUsers.toLocaleString()}
