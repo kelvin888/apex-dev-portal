@@ -135,7 +135,9 @@ export default function EditAppPage() {
         <div className="card-header">
           <div>
             <h1 className="text-xl font-semibold text-gray-900">Edit App</h1>
-            <p className="text-sm text-gray-500 font-mono mt-0.5">{app.appId}</p>
+            <p className="text-sm text-gray-500 font-mono mt-0.5">
+              {app.appId}
+            </p>
           </div>
         </div>
 
@@ -153,7 +155,9 @@ export default function EditAppPage() {
               {...register("name")}
             />
             {errors.name && (
-              <p className="text-error-600 text-sm mt-1">{errors.name.message}</p>
+              <p className="text-error-600 text-sm mt-1">
+                {errors.name.message}
+              </p>
             )}
           </div>
 
@@ -213,7 +217,9 @@ export default function EditAppPage() {
               {...register("icon")}
             />
             {errors.icon && (
-              <p className="text-error-600 text-sm mt-1">{errors.icon.message}</p>
+              <p className="text-error-600 text-sm mt-1">
+                {errors.icon.message}
+              </p>
             )}
             <p className="text-xs text-gray-500 mt-1">
               Recommended: 512×512px PNG or SVG

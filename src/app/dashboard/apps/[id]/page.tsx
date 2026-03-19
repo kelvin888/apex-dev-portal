@@ -376,7 +376,9 @@ export default function AppDetailPage() {
               <div className="w-10 h-10 bg-error-100 rounded-full flex items-center justify-center flex-shrink-0">
                 <Trash2 className="h-5 w-5 text-error-600" />
               </div>
-              <h3 className="text-lg font-semibold text-gray-900">Delete App?</h3>
+              <h3 className="text-lg font-semibold text-gray-900">
+                Delete App?
+              </h3>
             </div>
             <p className="text-gray-600 mt-2">
               Are you sure you want to permanently delete{" "}
