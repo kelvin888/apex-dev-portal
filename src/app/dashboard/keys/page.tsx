@@ -37,9 +37,9 @@ export default function ApiKeysPage() {
   const [newKey, setNewKey] = useState<NewKeyResponse | null>(null);
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
-  const { data: keys, isLoading } = useQuery({
+  const { data: keysData, isLoading } = useQuery({
     queryKey: ["api-keys"],
-    queryFn: () => api.get<ApiKey[]>("/auth/api-keys"),
+    queryFn: () => api.get<{ keys: ApiKey[] }>("/auth/api-keys"),
   });
 
   const deleteMutation = useMutation({
@@ -49,7 +49,7 @@ export default function ApiKeysPage() {
     },
   });
 
-  const displayKeys = keys ?? [];
+  const displayKeys = keysData?.keys ?? [];
 
   const copyToClipboard = (text: string, id: string) => {
     navigator.clipboard.writeText(text);

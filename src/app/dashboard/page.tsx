@@ -2,6 +2,7 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { api } from "@/lib/api";
+import { useAuth } from "@/lib/auth-context";
 import {
   Package,
   Download,
@@ -51,6 +52,7 @@ interface RecentApp {
 }
 
 export default function DashboardPage() {
+  const { user } = useAuth();
   const { data: stats } = useQuery({
     queryKey: ["dashboard-stats"],
     queryFn: () => api.get<DashboardStats>("/dashboard/stats"),
@@ -104,12 +106,14 @@ export default function DashboardPage() {
           change={displayStats.changes.downloads}
           icon={Download}
         />
-        <StatCard
-          title="Active Users"
-          value={displayStats.activeUsers.toLocaleString()}
-          change={displayStats.changes.users}
-          icon={Users}
-        />
+        {user?.role === 'admin' && (
+          <StatCard
+            title="Active Users"
+            value={displayStats.activeUsers.toLocaleString()}
+            change={displayStats.changes.users}
+            icon={Users}
+          />
+        )}
         <StatCard
           title="Revenue"
           value={`$${displayStats.revenue.toLocaleString()}`}
