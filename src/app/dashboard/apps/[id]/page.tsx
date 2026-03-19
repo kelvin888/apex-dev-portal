@@ -29,7 +29,8 @@ interface AppDetails {
   name: string;
   description?: string;
   icon?: string;
-  status: "draft" | "review" | "published" | "rejected";
+  status: "draft" | "pending" | "approved" | "rejected" | "suspended";
+  isPublic: boolean;
   category: string;
   createdAt: string;
   updatedAt: string;
@@ -65,6 +66,13 @@ export default function AppDetailPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["apps"] });
       router.push("/dashboard/apps");
+    },
+  });
+
+  const submitMutation = useMutation({
+    mutationFn: () => api.post(`/apps/${params.id}/submit`, {}),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["app", params.id] });
     },
   });
 
@@ -104,14 +112,15 @@ export default function AppDetailPage() {
     string,
     { color: string; icon: React.ComponentType<any>; label: string }
   > = {
-    published: {
+    approved: {
       color: "text-success-600",
       icon: CheckCircle,
-      label: "Published",
+      label: "Approved",
     },
-    review: { color: "text-warning-600", icon: Clock, label: "In Review" },
+    pending: { color: "text-warning-600", icon: Clock, label: "In Review" },
     draft: { color: "text-gray-500", icon: Pencil, label: "Draft" },
     rejected: { color: "text-error-600", icon: AlertCircle, label: "Rejected" },
+    suspended: { color: "text-error-600", icon: AlertCircle, label: "Suspended" },
   };
 
   const StatusIcon = statusConfig[app.status].icon;
@@ -157,7 +166,21 @@ export default function AppDetailPage() {
             <Pencil className="h-4 w-4 mr-2" />
             Edit
           </Link>
-          {displayApp.status === "draft" && (
+          {(displayApp.status === "draft" || displayApp.status === "rejected") && (
+            <button
+              onClick={() => submitMutation.mutate()}
+              disabled={submitMutation.isPending}
+              className="btn-primary"
+            >
+              {submitMutation.isPending ? (
+                <Loader2 className="h-4 w-4 animate-spin mr-2" />
+              ) : (
+                <Upload className="h-4 w-4 mr-2" />
+              )}
+              Submit for Review
+            </button>
+          )}
+          {displayApp.status === "approved" && !displayApp.isPublic && (
             <button
               onClick={() => publishMutation.mutate()}
               disabled={publishMutation.isPending}
@@ -166,9 +189,9 @@ export default function AppDetailPage() {
               {publishMutation.isPending ? (
                 <Loader2 className="h-4 w-4 animate-spin mr-2" />
               ) : (
-                <Upload className="h-4 w-4 mr-2" />
+                <ExternalLink className="h-4 w-4 mr-2" />
               )}
-              Submit for Review
+              Publish
             </button>
           )}
         </div>
@@ -188,7 +211,7 @@ export default function AppDetailPage() {
         >
           {statusConfig[displayApp.status].label}
         </span>
-        {displayApp.status === "published" && (
+        {displayApp.status === "approved" && displayApp.isPublic && (
           <a
             href={`apex://${displayApp.appId}`}
             className="ml-auto flex items-center gap-1 text-sm text-primary-600 hover:underline"
