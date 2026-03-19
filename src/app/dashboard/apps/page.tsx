@@ -126,7 +126,7 @@ export default function AppsPage() {
       {!isLoading && apps.length > 0 ? (
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
           {apps.map((app) => (
-            <AppCard key={app.id} app={app} />
+            <AppCard key={app.appId} app={app} />
           ))}
         </div>
       ) : null}
@@ -136,10 +136,11 @@ export default function AppsPage() {
 
 function AppCard({ app }: Readonly<{ app: App }>) {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const queryClient = useQueryClient();
 
   const unpublishMutation = useMutation({
-    mutationFn: () => api.post(`/apps/${app.id}/unpublish`, {}),
+    mutationFn: () => api.post(`/apps/${app.appId}/unpublish`, {}),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["apps"] });
       setMenuOpen(false);
@@ -147,21 +148,16 @@ function AppCard({ app }: Readonly<{ app: App }>) {
   });
 
   const deleteMutation = useMutation({
-    mutationFn: () => api.delete(`/apps/${app.id}`),
+    mutationFn: () => api.delete(`/apps/${app.appId}`),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["apps"] });
-      setMenuOpen(false);
+      setShowDeleteConfirm(false);
     },
   });
 
-  const handleDelete = () => {
-    if (
-      globalThis.confirm(
-        `Permanently delete "${app.name}"? This cannot be undone.`,
-      )
-    ) {
-      deleteMutation.mutate();
-    }
+  const handleDeleteClick = () => {
+    setMenuOpen(false);
+    setShowDeleteConfirm(true);
   };
 
   const statusColors: Record<string, string> = {
@@ -197,7 +193,7 @@ function AppCard({ app }: Readonly<{ app: App }>) {
         <div className="flex-1 min-w-0">
           <div className="flex items-center justify-between">
             <Link
-              href={`/dashboard/apps/${app.id}`}
+              href={`/dashboard/apps/${app.appId}`}
               className="font-semibold text-gray-900 hover:text-primary-600 truncate"
             >
               {app.name}
@@ -219,14 +215,14 @@ function AppCard({ app }: Readonly<{ app: App }>) {
                   />
                   <div className="absolute right-0 mt-1 w-44 bg-white rounded-lg shadow-lg border z-20">
                     <Link
-                      href={`/dashboard/apps/${app.id}`}
+                      href={`/dashboard/apps/${app.appId}`}
                       className="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50"
                     >
                       <Eye className="h-4 w-4" />
                       View
                     </Link>
                     <Link
-                      href={`/dashboard/apps/${app.id}/edit`}
+                      href={`/dashboard/apps/${app.appId}/edit`}
                       className="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50"
                     >
                       <Pencil className="h-4 w-4" />
@@ -258,7 +254,7 @@ function AppCard({ app }: Readonly<{ app: App }>) {
                     <button
                       className="w-full flex items-center gap-2 px-3 py-2 text-sm text-error-600 hover:bg-error-50 disabled:opacity-50"
                       disabled={deleteMutation.isPending}
-                      onClick={handleDelete}
+                      onClick={handleDeleteClick}
                     >
                       {deleteMutation.isPending ? (
                         <Loader2 className="h-4 w-4 animate-spin" />
@@ -299,6 +295,45 @@ function AppCard({ app }: Readonly<{ app: App }>) {
         Updated{" "}
         {formatDistanceToNow(new Date(app.updatedAt), { addSuffix: true })}
       </div>
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteConfirm && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50" onClick={() => setShowDeleteConfirm(false)}>
+          <div className="bg-white rounded-xl max-w-md w-full mx-4 p-6" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center gap-3 mb-2">
+              <div className="w-10 h-10 bg-error-100 rounded-full flex items-center justify-center flex-shrink-0">
+                <Trash2 className="h-5 w-5 text-error-600" />
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900">Delete App?</h3>
+            </div>
+            <p className="text-gray-600 mt-2">
+              Are you sure you want to permanently delete{" "}
+              <strong>{app.name}</strong>? All versions and data will be
+              removed. This cannot be undone.
+            </p>
+            <div className="flex gap-3 mt-6">
+              <button
+                onClick={() => setShowDeleteConfirm(false)}
+                className="btn-secondary flex-1"
+                disabled={deleteMutation.isPending}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => deleteMutation.mutate()}
+                disabled={deleteMutation.isPending}
+                className="btn-danger flex-1"
+              >
+                {deleteMutation.isPending ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  "Delete permanently"
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
