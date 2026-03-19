@@ -372,15 +372,30 @@ export default function AppDetailPage() {
       {showDeleteConfirm && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-white rounded-xl max-w-md w-full mx-4 p-6">
-            <h3 className="text-lg font-semibold text-gray-900">Delete App?</h3>
+            <div className="flex items-center gap-3 mb-2">
+              <div className="w-10 h-10 bg-error-100 rounded-full flex items-center justify-center flex-shrink-0">
+                <Trash2 className="h-5 w-5 text-error-600" />
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900">Delete App?</h3>
+            </div>
             <p className="text-gray-600 mt-2">
-              Are you sure you want to delete <strong>{displayApp.name}</strong>{" "}
-              ? This will permanently remove the app and all its data.
+              Are you sure you want to permanently delete{" "}
+              <strong>{displayApp.name}</strong>? All versions and data will be
+              removed. This cannot be undone.
             </p>
+            {deleteMutation.isError && (
+              <div className="mt-4 p-3 bg-error-50 border border-error-200 rounded-lg text-sm text-error-700">
+                {(deleteMutation.error as Error).message}
+              </div>
+            )}
             <div className="flex gap-3 mt-6">
               <button
-                onClick={() => setShowDeleteConfirm(false)}
+                onClick={() => {
+                  setShowDeleteConfirm(false);
+                  deleteMutation.reset();
+                }}
                 className="btn-secondary flex-1"
+                disabled={deleteMutation.isPending}
               >
                 Cancel
               </button>
@@ -392,7 +407,7 @@ export default function AppDetailPage() {
                 {deleteMutation.isPending ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
                 ) : (
-                  "Delete"
+                  "Delete permanently"
                 )}
               </button>
             </div>

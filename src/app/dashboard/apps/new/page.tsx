@@ -69,7 +69,7 @@ export default function NewAppPage() {
   const mutation = useMutation({
     mutationFn: (data: FormData) => api.post("/apps", data),
     onSuccess: (data: any) => {
-      router.push(`/dashboard/apps/${data.id}`);
+      router.push(`/dashboard/apps/${data.appId}`);
     },
   });
 
