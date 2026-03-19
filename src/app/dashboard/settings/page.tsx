@@ -221,7 +221,15 @@ export default function SettingsPage() {
         </div>
         <form onSubmit={handlePasswordSave} className="card-body space-y-4">
           {/* Hidden username field for password manager accessibility */}
-          <input type="text" name="username" autoComplete="username" value={user?.email ?? ""} readOnly className="hidden" aria-hidden="true" />
+          <input
+            type="text"
+            name="username"
+            autoComplete="username"
+            value={user?.email ?? ""}
+            readOnly
+            className="hidden"
+            aria-hidden="true"
+          />
           <div>
             <label htmlFor="currentPassword" className="label">
               Current Password

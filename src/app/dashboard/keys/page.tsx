@@ -49,7 +49,11 @@ export default function ApiKeysPage() {
     },
   });
 
-  const displayKeys = Array.isArray(keysData?.keys) ? keysData!.keys : Array.isArray(keysData) ? keysData as unknown as ApiKey[] : [];
+  const displayKeys = Array.isArray(keysData?.keys)
+    ? keysData!.keys
+    : Array.isArray(keysData)
+      ? (keysData as unknown as ApiKey[])
+      : [];
 
   const copyToClipboard = (text: string, id: string) => {
     navigator.clipboard.writeText(text);
@@ -128,7 +132,10 @@ export default function ApiKeysPage() {
                           </code>
                           <button
                             onClick={() =>
-                              copyToClipboard(`${key.keyPrefix}••••••••`, key.id)
+                              copyToClipboard(
+                                `${key.keyPrefix}••••••••`,
+                                key.id,
+                              )
                             }
                             className="p-1 rounded hover:bg-gray-100"
                             title="Copy key prefix"
@@ -255,7 +262,11 @@ function CreateKeyModal({
   const [copied, setCopied] = useState(false);
 
   const createMutation = useMutation({
-    mutationFn: () => api.post<NewKeyResponse>("/auth/api-keys", { name, permissions: ['read', 'upload', 'publish', 'delete'] }),
+    mutationFn: () =>
+      api.post<NewKeyResponse>("/auth/api-keys", {
+        name,
+        permissions: ["read", "upload", "publish", "delete"],
+      }),
     onSuccess: (data) => {
       onCreated(data);
     },
