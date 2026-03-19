@@ -298,13 +298,21 @@ function AppCard({ app }: Readonly<{ app: App }>) {
 
       {/* Delete Confirmation Modal */}
       {showDeleteConfirm && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50" onClick={() => setShowDeleteConfirm(false)}>
-          <div className="bg-white rounded-xl max-w-md w-full mx-4 p-6" onClick={(e) => e.stopPropagation()}>
+        <div
+          className="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
+          onClick={() => setShowDeleteConfirm(false)}
+        >
+          <div
+            className="bg-white rounded-xl max-w-md w-full mx-4 p-6"
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="flex items-center gap-3 mb-2">
               <div className="w-10 h-10 bg-error-100 rounded-full flex items-center justify-center flex-shrink-0">
                 <Trash2 className="h-5 w-5 text-error-600" />
               </div>
-              <h3 className="text-lg font-semibold text-gray-900">Delete App?</h3>
+              <h3 className="text-lg font-semibold text-gray-900">
+                Delete App?
+              </h3>
             </div>
             <p className="text-gray-600 mt-2">
               Are you sure you want to permanently delete{" "}
