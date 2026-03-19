@@ -1,7 +1,12 @@
-import Link from 'next/link';
-import { ArrowRight, Code, Rocket, Shield, Zap } from 'lucide-react';
+"use client";
+
+import Link from "next/link";
+import { ArrowRight, Code, Rocket, Shield, Zap } from "lucide-react";
+import { useAuth } from "@/lib/auth-context";
+import { PublicNavActions } from "@/components/public-nav-actions";
 
 export default function HomePage() {
+  const { user } = useAuth();
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
       {/* Header */}
@@ -18,15 +23,13 @@ export default function HomePage() {
               <Link href="/docs" className="text-gray-600 hover:text-gray-900">
                 Documentation
               </Link>
-              <Link href="/pricing" className="text-gray-600 hover:text-gray-900">
+              <Link
+                href="/pricing"
+                className="text-gray-600 hover:text-gray-900"
+              >
                 Pricing
               </Link>
-              <Link href="/login" className="text-gray-600 hover:text-gray-900">
-                Sign In
-              </Link>
-              <Link href="/register" className="btn-primary">
-                Get Started
-              </Link>
+              <PublicNavActions />
             </nav>
           </div>
         </div>
@@ -40,12 +43,15 @@ export default function HomePage() {
             <span className="text-primary-500"> Africa</span>
           </h1>
           <p className="mt-6 text-lg sm:text-xl text-gray-600 max-w-3xl mx-auto">
-            APEX is the leading super app platform for African markets.
-            Build, deploy, and scale mini-apps that reach millions of users.
+            APEX is the leading super app platform for African markets. Build,
+            deploy, and scale mini-apps that reach millions of users.
           </p>
           <div className="mt-10 flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/register" className="btn-primary text-base px-8 py-3">
-              Start Building Free
+            <Link
+              href={user ? "/dashboard" : "/register"}
+              className="btn-primary text-base px-8 py-3"
+            >
+              {user ? "Go to Dashboard" : "Start Building Free"}
               <ArrowRight className="ml-2 h-5 w-5" />
             </Link>
             <Link href="/docs" className="btn-secondary text-base px-8 py-3">
@@ -107,8 +113,11 @@ export default function HomePage() {
           <p className="mt-4 text-lg text-gray-600">
             Join thousands of developers building on APEX.
           </p>
-          <Link href="/register" className="mt-8 btn-primary text-base px-8 py-3 inline-flex">
-            Create Your Account
+          <Link
+            href={user ? "/dashboard" : "/register"}
+            className="mt-8 btn-primary text-base px-8 py-3 inline-flex"
+          >
+            {user ? "Go to Dashboard" : "Create Your Account"}
             <ArrowRight className="ml-2 h-5 w-5" />
           </Link>
         </div>
@@ -132,24 +141,56 @@ export default function HomePage() {
             <div>
               <h4 className="text-white font-medium mb-4">Platform</h4>
               <ul className="space-y-2 text-sm">
-                <li><Link href="/docs" className="hover:text-white">Documentation</Link></li>
-                <li><Link href="/docs/sdk" className="hover:text-white">SDK Reference</Link></li>
-                <li><Link href="/docs/cli" className="hover:text-white">CLI Tools</Link></li>
+                <li>
+                  <Link href="/docs" className="hover:text-white">
+                    Documentation
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/docs/sdk" className="hover:text-white">
+                    SDK Reference
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/docs/cli" className="hover:text-white">
+                    CLI Tools
+                  </Link>
+                </li>
               </ul>
             </div>
             <div>
               <h4 className="text-white font-medium mb-4">Company</h4>
               <ul className="space-y-2 text-sm">
-                <li><Link href="/about" className="hover:text-white">About</Link></li>
-                <li><Link href="/blog" className="hover:text-white">Blog</Link></li>
-                <li><Link href="/careers" className="hover:text-white">Careers</Link></li>
+                <li>
+                  <Link href="/about" className="hover:text-white">
+                    About
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/blog" className="hover:text-white">
+                    Blog
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/careers" className="hover:text-white">
+                    Careers
+                  </Link>
+                </li>
               </ul>
             </div>
             <div>
               <h4 className="text-white font-medium mb-4">Legal</h4>
               <ul className="space-y-2 text-sm">
-                <li><Link href="/privacy" className="hover:text-white">Privacy</Link></li>
-                <li><Link href="/terms" className="hover:text-white">Terms</Link></li>
+                <li>
+                  <Link href="/privacy" className="hover:text-white">
+                    Privacy
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/terms" className="hover:text-white">
+                    Terms
+                  </Link>
+                </li>
               </ul>
             </div>
           </div>

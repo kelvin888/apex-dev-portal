@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { PublicNavActions } from "@/components/public-nav-actions";
 import {
   ArrowRight,
   Book,
@@ -103,12 +104,7 @@ export default function DocsPage() {
               >
                 Pricing
               </Link>
-              <Link href="/login" className="text-gray-600 hover:text-gray-900">
-                Sign In
-              </Link>
-              <Link href="/register" className="btn-primary">
-                Get Started
-              </Link>
+              <PublicNavActions />
             </nav>
           </div>
         </div>
