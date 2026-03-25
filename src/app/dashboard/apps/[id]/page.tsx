@@ -232,17 +232,17 @@ export default function AppDetailPage() {
         <StatCard
           icon={Download}
           label="Total Downloads"
-          value={displayApp.stats.downloads.toLocaleString()}
+          value={(displayApp.stats?.downloads ?? 0).toLocaleString()}
         />
         <StatCard
           icon={Users}
           label="Active Users"
-          value={displayApp.stats.activeUsers.toLocaleString()}
+          value={(displayApp.stats?.activeUsers ?? 0).toLocaleString()}
         />
         <StatCard
           icon={Star}
           label="Rating"
-          value={`${displayApp.stats.rating.toFixed(1)} (${displayApp.stats.reviews})`}
+          value={`${(displayApp.stats?.rating ?? 0).toFixed(1)} (${displayApp.stats?.reviews ?? 0})`}
         />
         <StatCard
           icon={Clock}
@@ -298,7 +298,7 @@ export default function AppDetailPage() {
                     </div>
                     <div className="text-sm text-gray-500 mt-1">
                       {format(new Date(version.createdAt), "MMM d, yyyy")} •{" "}
-                      {version.downloads.toLocaleString()} downloads
+                      {(version.downloads ?? 0).toLocaleString()} downloads
                     </div>
                   </div>
                   <ChevronRight className="h-5 w-5 text-gray-400" />
