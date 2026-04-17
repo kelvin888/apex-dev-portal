@@ -10,6 +10,9 @@ import {
   Package,
   Shield,
   Zap,
+  Plug,
+  Layers,
+  Map,
 } from "lucide-react";
 
 const sections = [
@@ -78,6 +81,42 @@ const sections = [
       { label: "AXML Syntax", href: "/docs/dsl#axml" },
       { label: "ACSS Styling", href: "/docs/dsl#acss" },
       { label: "Built-in Components", href: "/docs/dsl#components" },
+    ],
+  },
+  {
+    icon: Plug,
+    title: "Bridge Protocol",
+    description: "JS Bridge spec — secure message passing between mini-apps and native APIs.",
+    href: "/docs/bridge-protocol",
+    links: [
+      { label: "Overview", href: "/docs/bridge-protocol#overview" },
+      { label: "Message Format", href: "/docs/bridge-protocol#message-format" },
+      { label: "API Namespaces", href: "/docs/bridge-protocol#namespaces" },
+      { label: "Error Codes", href: "/docs/bridge-protocol#errors" },
+    ],
+  },
+  {
+    icon: Layers,
+    title: "Component Reference",
+    description: "All built-in AXML components: containers, inputs, media, and navigation.",
+    href: "/docs/components",
+    links: [
+      { label: "view & scroll-view", href: "/docs/components#view" },
+      { label: "button & input", href: "/docs/components#button" },
+      { label: "image", href: "/docs/components#image" },
+      { label: "navigator", href: "/docs/components#navigator" },
+    ],
+  },
+  {
+    icon: Map,
+    title: "Architecture",
+    description: "Full system architecture — host apps, framework, bridge, and distribution.",
+    href: "/docs/architecture",
+    links: [
+      { label: "Four Pillars", href: "/docs/architecture#pillars" },
+      { label: "Bridge Communication", href: "/docs/architecture#bridge" },
+      { label: "Security Model", href: "/docs/architecture#security" },
+      { label: "Download PDF", href: "/APEX_Architecture.pdf" },
     ],
   },
 ];
