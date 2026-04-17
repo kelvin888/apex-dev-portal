@@ -41,8 +41,8 @@ export default function BridgeProtocolPage() {
             <p className="text-gray-600 mb-4">
               The JS Bridge (JSB) is the most critical component of the
               platform. All bridge calls are asynchronous, permission-checked,
-              and versioned. The mini-app never has direct access to native
-              APIs — every call goes through the bridge.
+              and versioned. The mini-app never has direct access to native APIs
+              — every call goes through the bridge.
             </p>
             <div className="overflow-x-auto">
               <table className="w-full text-sm border-collapse">
@@ -59,18 +59,12 @@ export default function BridgeProtocolPage() {
                 <tbody className="divide-y divide-gray-100">
                   {[
                     ["Async First", "All bridge calls are Promise-based"],
-                    [
-                      "Type Safe",
-                      "Strongly typed request/response schemas",
-                    ],
+                    ["Type Safe", "Strongly typed request/response schemas"],
                     [
                       "Permission Aware",
                       "Every API checks against granted permissions",
                     ],
-                    [
-                      "Versioned",
-                      "Protocol version negotiated at runtime",
-                    ],
+                    ["Versioned", "Protocol version negotiated at runtime"],
                     [
                       "Auditable",
                       "All calls logged for debugging and security",

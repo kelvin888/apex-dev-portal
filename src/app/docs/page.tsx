@@ -86,7 +86,8 @@ const sections = [
   {
     icon: Plug,
     title: "Bridge Protocol",
-    description: "JS Bridge spec — secure message passing between mini-apps and native APIs.",
+    description:
+      "JS Bridge spec — secure message passing between mini-apps and native APIs.",
     href: "/docs/bridge-protocol",
     links: [
       { label: "Overview", href: "/docs/bridge-protocol#overview" },
@@ -98,7 +99,8 @@ const sections = [
   {
     icon: Layers,
     title: "Component Reference",
-    description: "All built-in AXML components: containers, inputs, media, and navigation.",
+    description:
+      "All built-in AXML components: containers, inputs, media, and navigation.",
     href: "/docs/components",
     links: [
       { label: "view & scroll-view", href: "/docs/components#view" },
@@ -110,7 +112,8 @@ const sections = [
   {
     icon: Map,
     title: "Architecture",
-    description: "Full system architecture — host apps, framework, bridge, and distribution.",
+    description:
+      "Full system architecture — host apps, framework, bridge, and distribution.",
     href: "/docs/architecture",
     links: [
       { label: "Four Pillars", href: "/docs/architecture#pillars" },
